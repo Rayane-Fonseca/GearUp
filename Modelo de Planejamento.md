@@ -11,7 +11,7 @@ Este documento serve como a especificação técnica oficial e o plano de desenv
 O sistema é dividido em **4** grandes pilares principais, separando claramente o funil de aquisição, as regras de acesso e o núcleo (core business) da aplicação.
 
 ### 1.1. Funil de Aquisição & Monetização
-* **Apresentação e Vendas:** Landing page institucional apresentando o GearUp para empresas-cliente (proposta de valor, funcionalidades de trilhas/certificação, planos de precificação). *(não observado nas telas capturadas — presumido pelo modelo B2B SaaS)*.
+* **Apresentação e Vendas:** Landing page institucional apresentando o GearUp para empresas-cliente (proposta de valor, funcionalidades de trilhas/certificação, planos de precificação).
 * **Modelos de Cobrança:**
     * *Assinatura (SaaS):* Planos recorrentes por empresa-cliente (tenant), provavelmente com cobrança por número de colaboradores ativos (per-seat). Inclui regras de *Grace Period* (tolerância para falhas de pagamento) e *Grandfathering* (manutenção de preço antigo para clientes legados).
     * *Venda Avulsa (One-time):* Não identificado nas telas — a plataforma opera no modelo de acesso corporativo contínuo (todos os cursos liberados por assinatura da empresa).
