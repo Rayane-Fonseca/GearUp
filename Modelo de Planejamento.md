@@ -74,7 +74,182 @@ O sistema é dividido em **4** grandes pilares principais, separando claramente 
 
 ## 4. Modelagem e Arquitetura de Dados (Dicionário Macro)
 
-> Modelagem detalhada por entidade, com diagrama ER completo, disponível no documento `levantamento_modelagem_gearup.md` gerado anteriormente. Resumo macro abaixo, no formato do template:
+> # Levantamento de Modelagem de Dados — Plataforma GearUp (LMS Corporativo)
+
+## 1. Contexto
+
+O GearUp é uma plataforma de treinamento corporativo (LMS) com dois perfis de acesso — **Colaborador** e **Administrador** — usada para gerenciar cursos, trilhas de aprendizagem, matrículas, progresso e certificação dos funcionários da TechCorp. Este levantamento foi feito a partir da inspeção visual das telas do sistema (Início, Cursos, Trilhas, Certificados, Dashboard Administrativo, Gerenciar Cursos, Gerenciar Colaboradores).
+
+---
+
+## 2. Entidades identificadas
+
+### 2.1 AREA (Área de atuação / categoria)
+Categoriza usuários, cursos e trilhas (ex: DevOps, Cloud Computing, Segurança da Informação, Desenvolvimento de Software, Infraestrutura, Banco de Dados, Suporte Técnico).
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| nome | string | Único |
+
+### 2.2 USUARIO (Colaborador / Instrutor / Administrador)
+Um único cadastro de pessoa, diferenciado por `perfil_acesso` e, opcionalmente, atuando como instrutor de cursos.
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| nome | string | |
+| email | string | Único, formato `nome@techcorp.com.br` |
+| cargo | string | Ex: "Desenvolvedor Sênior", "DevOps Engineer" |
+| area_id | FK → AREA | Área de atuação do usuário |
+| perfil_acesso | enum | `colaborador` \| `administrador` |
+| avatar_iniciais | string | Derivado do nome (ex: "LA") |
+
+### 2.3 CURSO
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| nome | string | |
+| area_id | FK → AREA | Categoria do curso |
+| instrutor_id | FK → USUARIO | Responsável pelo conteúdo |
+| carga_horaria | int (horas) | Ex: 18h, 32h |
+| numero_modulos | int | Derivável de MODULO, mas exibido como atributo direto no admin |
+| status | enum | `não iniciado` \| `em andamento` \| `concluído` (status agregado, calculado ou geral do curso) |
+
+### 2.4 MODULO
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| curso_id | FK → CURSO | |
+| titulo | string | |
+| ordem | int | Sequência dentro do curso |
+
+### 2.5 TRILHA (Learning Path)
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| nome | string | Ex: "Banco de Dados" |
+| area_id | FK → AREA | |
+| percentual_conclusao | decimal | Calculado a partir das matrículas dos cursos vinculados |
+
+### 2.6 TRILHA_CURSO (associativa N:N)
+Vincula cursos a trilhas, definindo se são obrigatórios ou opcionais.
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| trilha_id | FK → TRILHA | PK composta |
+| curso_id | FK → CURSO | PK composta |
+| tipo | enum | `obrigatório` \| `opcional` |
+
+### 2.7 MATRICULA (Progresso do usuário no curso)
+Entidade associativa entre USUARIO e CURSO que registra o progresso individual.
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| usuario_id | FK → USUARIO | |
+| curso_id | FK → CURSO | |
+| percentual_concluido | int (0-100) | |
+| status | enum | `não iniciado` \| `em andamento` \| `concluído` |
+| data_inicio | date | |
+| data_conclusao | date, nullable | Preenchida quando status = concluído |
+
+> Regra: `UNIQUE(usuario_id, curso_id)` — um usuário tem no máximo uma matrícula ativa por curso.
+
+### 2.8 CERTIFICADO
+Emitido quando uma MATRICULA atinge 100% / status concluído.
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| usuario_id | FK → USUARIO | |
+| curso_id | FK → CURSO | |
+| data_emissao | date | |
+| carga_horaria | int | Copiado do curso no momento da emissão (histórico) |
+| url_pdf | string | Link para download |
+
+### 2.9 ATIVIDADE_PENDENTE
+Prazos e tarefas associadas a um curso em andamento (provas, módulos a assistir).
+
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| usuario_id | FK → USUARIO | |
+| curso_id | FK → CURSO | |
+| tipo | enum | `prova` \| `módulo` \| `outro` |
+| descricao | string | Ex: "Prova final — Docker e Kubernetes" |
+| prazo | date | |
+| status | enum | `pendente` \| `concluída` |
+
+### 2.10 AVISO (Comunicado da empresa)
+| Atributo | Tipo | Observação |
+|---|---|---|
+| id | PK, int | |
+| titulo | string | |
+| descricao | string | |
+| data_publicacao | date | |
+| tipo | enum | Ex: `nova trilha`, `prazo de certificação` |
+
+---
+
+## 3. Relacionamentos e cardinalidade
+
+| Relacionamento | Cardinalidade | Descrição |
+|---|---|---|
+| AREA → USUARIO | 1:N | Uma área agrupa vários colaboradores |
+| AREA → CURSO | 1:N | Uma área agrupa vários cursos |
+| AREA → TRILHA | 1:N | Uma área agrupa uma trilha (ou mais) |
+| USUARIO (instrutor) → CURSO | 1:N | Um instrutor leciona vários cursos |
+| CURSO → MODULO | 1:N | Um curso possui vários módulos |
+| TRILHA ↔ CURSO | N:N (via TRILHA_CURSO) | Um curso pode pertencer a mais de uma trilha; uma trilha tem vários cursos |
+| USUARIO ↔ CURSO | N:N (via MATRICULA) | Progresso individual por curso |
+| USUARIO → CERTIFICADO | 1:N | Um usuário acumula vários certificados |
+| CURSO → CERTIFICADO | 1:N | Um curso gera certificado para cada concluinte |
+| USUARIO → ATIVIDADE_PENDENTE | 1:N | |
+| CURSO → ATIVIDADE_PENDENTE | 1:N | |
+
+---
+
+## 4. Regras de negócio observadas nas telas
+
+1. Um usuário só pode ter `perfil_acesso = administrador` para acessar Dashboard, Gerenciar Cursos e Gerenciar Colaboradores.
+2. O **progresso geral** do usuário (ex: 47%) é uma média calculada sobre todas as suas MATRICULAS.
+3. Uma **trilha** só é considerada concluída (100%) quando todos os cursos marcados como `obrigatório` em TRILHA_CURSO estão com status `concluído` na MATRICULA do usuário.
+4. **Certificado** é gerado automaticamente (ou emitido) somente quando `MATRICULA.percentual_concluido = 100`.
+5. O card "Próximo certificado" indica que o sistema calcula, por curso não concluído, quanto falta para desbloquear — sugere uma trava de negócio "1 certificado por curso concluído".
+6. **Atividades pendentes** têm prazo e ficam associadas ao curso e ao usuário — possivelmente geradas a partir dos módulos/avaliações do curso.
+7. O **Dashboard Administrativo** consome dados agregados de MATRICULA (para os gráficos de "Atividade mensal" e "Distribuição") e não é uma entidade própria — é uma camada de relatório/agregação.
+8. **Gerenciar Cursos** permite operações CRUD completas sobre CURSO (novo, editar, excluir), reforçando que é a entidade mestre administrada centralmente.
+
+---
+
+## 5. Observações e pontos em aberto (não visíveis nas telas)
+
+Como a análise foi feita apenas a partir dos frames visuais (sem áudio/documentação), os seguintes pontos precisam de validação com o time ou com a narração do vídeo:
+- Se **instrutor** é sempre um USUARIO interno (com login) ou pode ser um cadastro simples de nome (sem conta de acesso).
+- Se existe um **histórico de tentativas de prova** (notas, tentativas) ou apenas o status pendente/concluída.
+- Se as **notificações** (sino no topo, "3") são uma entidade própria (NOTIFICACAO) separada de AVISO, com campo `lida`.
+- Regras de expiração/revalidação de certificado (não observado nas telas).
+- Se módulos possuem conteúdo tipado (vídeo, texto, quiz) — não visível nos frames capturados.
+
+---
+
+## 6. Diagrama Entidade-Relacionamento
+
+O diagrama ER foi gerado na conversa (visualização interativa). Resumo estrutural:
+
+```
+AREA 1─N USUARIO
+AREA 1─N CURSO
+AREA 1─N TRILHA
+USUARIO(instrutor) 1─N CURSO
+CURSO 1─N MODULO
+TRILHA N─N CURSO (via TRILHA_CURSO)
+USUARIO N─N CURSO (via MATRICULA)
+USUARIO 1─N CERTIFICADO N─1 CURSO
+USUARIO 1─N ATIVIDADE_PENDENTE N─1 CURSO
+```
+
 
 #### Entidades Base e Acesso
 * **`users`:** `id`, `name`, `email`, `password`, `cargo`, `area_id` (FK), `role` (colaborador/administrador), `status`, `last_login_at`, `timestamps`.
