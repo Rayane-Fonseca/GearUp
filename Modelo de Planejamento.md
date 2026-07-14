@@ -2,7 +2,7 @@
 
 Este documento serve como a especificação técnica oficial e o plano de desenvolvimento passo a passo para o desenvolvimento do **GearUp**, uma plataforma **SaaS B2B de Treinamento Corporativo (Corporate LMS — Learning Management System)**. O objetivo do projeto é aplicar conceitos avançados de desenvolvimento web moderno e infraestrutura em contêineres, garantindo práticas rigorosas de segurança, automação, resiliência e arquitetura moderna.
 
-> **Nota de origem:** as seções 1 e 4 foram preenchidas a partir da inspeção das telas reais do produto (vídeo de demonstração). As seções 2 e 3 (stack tecnológica e arquitetura de segurança) contêm **sugestões técnicas a validar com o time**, pois não foram observadas diretamente no material de origem — estão sinalizadas como tal.
+> **Nota de origem:** ainda precisa de alterações.
 
 ---
 
