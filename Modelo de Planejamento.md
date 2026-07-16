@@ -225,15 +225,15 @@ O GearUp é uma plataforma de treinamento corporativo (LMS) com dois perfis de a
 ## 8. Guia de Desenvolvimento (Checklist de Etapas)
 
 ### [ ] ETAPA 1: Setup do Ambiente
-- [ ] Projeto Laravel 11 configurado com Filament 3 instalado.
-- [ ] Configuração do ambiente local (XAMPP) e `.env`.
-- [ ] Repositório Git/GitHub configurado.
+- [X] Projeto Laravel 11 configurado com Filament 3 instalado.
+- [X] Configuração do ambiente local (XAMPP) e `.env`.
+- [X] Repositório Git/GitHub configurado.
 
 ### [ ] ETAPA 2: Camada de Dados, Autenticação e Permissões
-- [ ] Migrations para `users`, `areas`, `courses`, `modules`, `learning_paths`, `learning_path_courses`, `enrollments`, `certificates`, `pending_activities`, `announcements`.
-- [ ] Models com relacionamentos (1:N e N:N via tabelas associativas).
+- [X] Migrations para `users`, `areas`, `courses`, `modules`, `learning_paths`, `learning_path_courses`, `enrollments`, `certificates`, `pending_activities`, `announcements`.
+- [X] Models com relacionamentos (1:N e N:N via tabelas associativas).
 - [ ] Autenticação via Sanctum + Roles (colaborador / administrador) via policies/middleware.
-- [ ] Seeders para popular colaboradores, cursos e trilhas de teste (cenário TechCorp).
+- [X] Seeders para popular colaboradores, cursos e trilhas de teste (cenário TechCorp).
 
 ### [ ] ETAPA 3: Núcleo de Segurança
 - [ ] Validação de uploads (tipo/tamanho) e sanitização de inputs ricos.
