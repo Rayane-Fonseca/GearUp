@@ -1,3 +1,40 @@
+## 8. Guia de Desenvolvimento (Checklist de Etapas)
+
+### [ ] ETAPA 1: Setup do Ambiente
+- [X] Projeto Laravel 11 configurado com Filament 3 instalado.
+- [X] Configuração do ambiente local (XAMPP) e `.env`.
+- [X] Repositório Git/GitHub configurado.
+
+### [ ] ETAPA 2: Camada de Dados, Autenticação e Permissões
+- [X] Migrations para `users`, `areas`, `courses`, `modules`, `learning_paths`, `learning_path_courses`, `enrollments`, `certificates`, `pending_activities`, `announcements`.
+- [X] Models com relacionamentos (1:N e N:N via tabelas associativas).
+- [X] Autenticação via Sanctum + Roles (colaborador / administrador) via policies/middleware. <- middleware feito
+- [X] Seeders para popular colaboradores, cursos e trilhas de teste (cenário TechCorp).
+
+### [ ] ETAPA 3: Núcleo de Segurança
+- [X] Validação de uploads (tipo/tamanho) e sanitização de inputs ricos.
+- [X] Proteção de rotas de API via Sanctum.
+- [X] Rate limiting em rotas sensíveis (login, uploads).
+
+### [ ] ETAPA 4: Core Business
+- [ ] Catálogo de Cursos com filtros por área.
+- [ ] Trilhas de Aprendizagem (obrigatórios x opcionais, cálculo de % agregado).
+- [ ] Matrícula/Progresso (tela "Início" com cursos em andamento e % de conclusão).
+- [ ] Emissão e download de Certificados em PDF (dompdf).
+- [ ] Dashboard Administrativo (Filament Widgets: KPIs, gráficos de atividade mensal e distribuição).
+- [ ] Filament Resources de Gerenciar Cursos e Gerenciar Colaboradores (visão Admin).
+- [ ] Validações de regras de negócio (ex: certificado só emitido a 100% de conclusão).
+- [ ] Testes unitários e de integração (Feature Tests) para progresso e certificação.
+
+### [ ] ETAPA 5: Filas e Notificações
+- [ ] Configurar Laravel Queues para geração assíncrona de PDF de certificado.
+- [ ] Rotinas de disparo de avisos/e-mails (novo curso, prazo de atividade pendente) via Notifications.
+- [ ] Comandos agendados (Scheduler): varredura de atividades pendentes vencendo, recálculo de progresso de trilhas.
+
+### [ ] ETAPA 6: Interfaces Visuais e Frontend
+- [ ] Painel Administrador via Filament (Dashboard, Cursos, Colaboradores), seguindo o padrão visual (sidebar escura, cards brancos, badges de status).
+- [ ] Interface do Colaborador (Início, Cursos, Trilhas, Certificados, Perfil) com Blade + CSS/JS, responsiva.
+
 # GearUp: Planejamento Geral & Modelagem de Arquitetura
 
 Este documento serve como a especificação técnica oficial e o plano de desenvolvimento passo a passo para o **GearUp**, uma plataforma de **Treinamento Corporativo (LMS — Learning Management System)** voltada ao setor automotivo. O escopo atual foca em um único cliente/empresa (cenário acadêmico TechCorp), com arquitetura pensada para evoluir depois para multi-tenant/SaaS.
@@ -222,42 +259,7 @@ O GearUp é uma plataforma de treinamento corporativo (LMS) com dois perfis de a
 
 ---
 
-## 8. Guia de Desenvolvimento (Checklist de Etapas)
 
-### [ ] ETAPA 1: Setup do Ambiente
-- [X] Projeto Laravel 11 configurado com Filament 3 instalado.
-- [X] Configuração do ambiente local (XAMPP) e `.env`.
-- [X] Repositório Git/GitHub configurado.
-
-### [ ] ETAPA 2: Camada de Dados, Autenticação e Permissões
-- [X] Migrations para `users`, `areas`, `courses`, `modules`, `learning_paths`, `learning_path_courses`, `enrollments`, `certificates`, `pending_activities`, `announcements`.
-- [X] Models com relacionamentos (1:N e N:N via tabelas associativas).
-- [X] Autenticação via Sanctum + Roles (colaborador / administrador) via policies/middleware. <- middleware feito
-- [X] Seeders para popular colaboradores, cursos e trilhas de teste (cenário TechCorp).
-
-### [ ] ETAPA 3: Núcleo de Segurança
-- [ ] Validação de uploads (tipo/tamanho) e sanitização de inputs ricos.
-- [ ] Proteção de rotas de API via Sanctum.
-- [ ] Rate limiting em rotas sensíveis (login, uploads).
-
-### [ ] ETAPA 4: Core Business
-- [ ] Catálogo de Cursos com filtros por área.
-- [ ] Trilhas de Aprendizagem (obrigatórios x opcionais, cálculo de % agregado).
-- [ ] Matrícula/Progresso (tela "Início" com cursos em andamento e % de conclusão).
-- [ ] Emissão e download de Certificados em PDF (dompdf).
-- [ ] Dashboard Administrativo (Filament Widgets: KPIs, gráficos de atividade mensal e distribuição).
-- [ ] Filament Resources de Gerenciar Cursos e Gerenciar Colaboradores (visão Admin).
-- [ ] Validações de regras de negócio (ex: certificado só emitido a 100% de conclusão).
-- [ ] Testes unitários e de integração (Feature Tests) para progresso e certificação.
-
-### [ ] ETAPA 5: Filas e Notificações
-- [ ] Configurar Laravel Queues para geração assíncrona de PDF de certificado.
-- [ ] Rotinas de disparo de avisos/e-mails (novo curso, prazo de atividade pendente) via Notifications.
-- [ ] Comandos agendados (Scheduler): varredura de atividades pendentes vencendo, recálculo de progresso de trilhas.
-
-### [ ] ETAPA 6: Interfaces Visuais e Frontend
-- [ ] Painel Administrador via Filament (Dashboard, Cursos, Colaboradores), seguindo o padrão visual (sidebar escura, cards brancos, badges de status).
-- [ ] Interface do Colaborador (Início, Cursos, Trilhas, Certificados, Perfil) com Blade + CSS/JS, responsiva.
 
 ### [ ] ETAPA 7: Monitoramento e Deploy
 - [ ] Tratamento global de exceções (ocultar stack traces em produção).
