@@ -17,8 +17,8 @@
 - [X] Rate limiting em rotas sensíveis (login, uploads).
 
 ### [ ] ETAPA 4: Core Business
-- [ ] Catálogo de Cursos com filtros por área.
-- [ ] Trilhas de Aprendizagem (obrigatórios x opcionais, cálculo de % agregado).
+- [X] Catálogo de Cursos com filtros por área.
+- [X] Trilhas de Aprendizagem (obrigatórios x opcionais, cálculo de % agregado).
 - [ ] Matrícula/Progresso (tela "Início" com cursos em andamento e % de conclusão).
 - [ ] Emissão e download de Certificados em PDF (dompdf).
 - [ ] Dashboard Administrativo (Filament Widgets: KPIs, gráficos de atividade mensal e distribuição).
