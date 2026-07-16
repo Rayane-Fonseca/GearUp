@@ -232,7 +232,7 @@ O GearUp é uma plataforma de treinamento corporativo (LMS) com dois perfis de a
 ### [ ] ETAPA 2: Camada de Dados, Autenticação e Permissões
 - [X] Migrations para `users`, `areas`, `courses`, `modules`, `learning_paths`, `learning_path_courses`, `enrollments`, `certificates`, `pending_activities`, `announcements`.
 - [X] Models com relacionamentos (1:N e N:N via tabelas associativas).
-- [ ] Autenticação via Sanctum + Roles (colaborador / administrador) via policies/middleware.
+- [X] Autenticação via Sanctum + Roles (colaborador / administrador) via policies/middleware. <- middleware feito
 - [X] Seeders para popular colaboradores, cursos e trilhas de teste (cenário TechCorp).
 
 ### [ ] ETAPA 3: Núcleo de Segurança
