@@ -19,12 +19,12 @@
 ### [ ] ETAPA 4: Core Business
 - [X] Catálogo de Cursos com filtros por área.
 - [X] Trilhas de Aprendizagem (obrigatórios x opcionais, cálculo de % agregado).
-- [ ] Matrícula/Progresso (tela "Início" com cursos em andamento e % de conclusão).
-- [ ] Emissão e download de Certificados em PDF (dompdf).
-- [ ] Dashboard Administrativo (Filament Widgets: KPIs, gráficos de atividade mensal e distribuição).
-- [ ] Filament Resources de Gerenciar Cursos e Gerenciar Colaboradores (visão Admin).
-- [ ] Validações de regras de negócio (ex: certificado só emitido a 100% de conclusão).
-- [ ] Testes unitários e de integração (Feature Tests) para progresso e certificação.
+- [X] Matrícula/Progresso (tela "Início" com cursos em andamento e % de conclusão).
+- [X] Emissão e download de Certificados em PDF (dompdf).
+- [X] Dashboard Administrativo (Filament Widgets: KPIs, gráficos de atividade mensal e distribuição).
+- [X] Filament Resources de Gerenciar Cursos e Gerenciar Colaboradores (visão Admin).
+- [X] Validações de regras de negócio (ex: certificado só emitido a 100% de conclusão).
+- [X] Testes unitários e de integração (Feature Tests) para progresso e certificação.
 
 ### [ ] ETAPA 5: Filas e Notificações
 - [ ] Configurar Laravel Queues para geração assíncrona de PDF de certificado.
