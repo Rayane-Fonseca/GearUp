@@ -11,13 +11,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# Removido o 'cp .env.example .env' para permitir que o Render injete as variáveis reais
 RUN composer install --optimize-autoloader --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+# Aponta o DocumentRoot do Apache diretamente para a pasta public do Laravel
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/apache2.conf
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
