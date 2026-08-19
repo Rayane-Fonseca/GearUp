@@ -1,0 +1,23 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-DaoKuWwz.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/admin-charts.js": {
+    "file": "assets/admin-charts-nQV_URqf.js",
+    "name": "admin-charts",
+    "src": "resources/js/admin-charts.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BPjt-bD7.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
