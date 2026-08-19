@@ -20,7 +20,7 @@ php artisan route:clear
 php artisan view:clear
 
 # Executa as migrações no banco Neon
-php artisan migrate --force
+php artisan migrate --seed --force
 
 # Inicia o Apache
 apache2-foreground
