@@ -15,7 +15,7 @@
             <!-- Logo e Nome -->
             <div class="relative z-10 flex items-center gap-2">
                 <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow p-1">
-                    <img src="<?php echo e(asset('images/logo.png')); ?>" alt="GearUp Logo" class="w-full h-full object-contain">
+                    <img src="<?php echo e(asset('images/Logo.png')); ?>" alt="GearUp Logo" class="w-full h-full object-contain">
                 </div>
                 <span class="font-bold text-2xl tracking-wide">GearUp</span>
             </div>
