@@ -11,8 +11,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
+# Removido o 'cp .env.example .env' para permitir que o Render injete as variáveis reais
 RUN composer install --optimize-autoloader --no-dev \
-    && cp .env.example .env \
     && chown -R www-data:www-data storage bootstrap/cache
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
