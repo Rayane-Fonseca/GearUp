@@ -31,7 +31,7 @@
             <nav class="flex items-center justify-between gap-4">
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                    <img src="{{ asset('images/logo.png') }}" alt="GearUp Logo" class="h-9 w-auto object-contain transition-transform group-hover:scale-105">
+                    <img src="{{ asset('images/Logo.png') }}" alt="GearUp Logo" class="h-9 w-auto object-contain transition-transform group-hover:scale-105">
                     <span class="font-bold text-xl text-[#1b1b18] dark:text-[#EDEDEC] tracking-wide">GearUp</span>
                 </a>
 
@@ -74,7 +74,7 @@
                     <div>
                         <!-- Logo & Badge Header -->
                         <div class="flex items-center gap-3 mb-6">
-                            <img src="{{ asset('images/logo.png') }}" alt="GearUp Logo" class="h-10 w-auto object-contain">
+                            <img src="{{ asset('images/Logo.png') }}" alt="GearUp Logo" class="h-10 w-auto object-contain">
                             <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#1b1b18]/5 dark:bg-white/10 text-[#1b1b18] dark:text-[#EDEDEC]">
                                 Plataforma Inteligente
                             </span>
