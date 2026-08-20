@@ -1,14 +1,23 @@
-<x-aluno-layout titulo-pagina="{{ $aula->titulo }}" subtitulo-pagina="{{ $curso->titulo }}">
-    <div x-data="{ sidebarOpen: true, moduloAberto: {{ $aula->modulo_id ?? $aula->id_modulo ?? 'null' }} }" class="h-[calc(100vh-4rem)] flex flex-col bg-slate-50 text-gray-800 overflow-hidden">
+<?php if (isset($component)) { $__componentOriginale4ebc9ed57c5009c9a50770282541134 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale4ebc9ed57c5009c9a50770282541134 = $attributes; } ?>
+<?php $component = App\View\Components\AlunoLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('aluno-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AlunoLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['titulo-pagina' => ''.e($aula->titulo).'','subtitulo-pagina' => ''.e($curso->titulo).'']); ?>
+    <div x-data="{ sidebarOpen: true, moduloAberto: <?php echo e($aula->modulo_id ?? $aula->id_modulo ?? 'null'); ?> }" class="h-[calc(100vh-4rem)] flex flex-col bg-slate-50 text-gray-800 overflow-hidden">
 
         <!-- Header Superior do Player -->
         <header class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between shadow-xs shrink-0 z-10">
             <div class="flex items-center gap-4">
-                <a href="{{ route('aluno.cursos.show', $curso->id_curso ?? $curso->id) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
+                <a href="<?php echo e(route('aluno.cursos.show', $curso->id_curso ?? $curso->id)); ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
                     Voltar ao Curso
                 </a>
                 <span class="text-gray-200">|</span>
-                <h1 class="text-sm font-bold text-gray-900 truncate max-w-xl">{{ $curso->titulo }}</h1>
+                <h1 class="text-sm font-bold text-gray-900 truncate max-w-xl"><?php echo e($curso->titulo); ?></h1>
             </div>
 
             <!-- Botão de Ocultar/Exibir Sidebar -->
@@ -29,27 +38,27 @@
 
                     <!-- Container do Player -->
                     <div class="relative w-full h-[480px] lg:h-[560px] bg-gray-900 rounded-2xl overflow-hidden shadow-sm border border-gray-100 mx-auto">
-                        @if(!empty($aula->url_video))
-                            @if(Str::contains($aula->url_video, ['youtube.com', 'youtu.be']))
-                                @php
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($aula->url_video)): ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Str::contains($aula->url_video, ['youtube.com', 'youtu.be'])): ?>
+                                <?php
                                     preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/', $aula->url_video, $matches);
                                     $youtubeId = $matches[1] ?? null;
-                                @endphp
+                                ?>
 
-                                @if($youtubeId)
-                                    <div id="youtube-player" data-video-id="{{ $youtubeId }}" class="w-full h-full"></div>
-                                @else
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($youtubeId): ?>
+                                    <div id="youtube-player" data-video-id="<?php echo e($youtubeId); ?>" class="w-full h-full"></div>
+                                <?php else: ?>
                                     <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-900 p-6 text-center">
                                         <span class="text-xs font-medium text-red-400">URL do YouTube inválida ou não reconhecida.</span>
                                     </div>
-                                @endif
-                            @else
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            <?php else: ?>
                                 <video id="html5-player" class="w-full h-full object-contain" controls controlsList="nodownload">
-                                    <source src="{{ $aula->url_video }}" type="video/mp4">
+                                    <source src="<?php echo e($aula->url_video); ?>" type="video/mp4">
                                     Seu navegador não suporta reprodução de vídeos.
                                 </video>
-                            @endif
-                        @else
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <?php else: ?>
                             <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-900 p-6 text-center">
                                 <svg class="w-14 h-14 mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -57,19 +66,21 @@
                                 </svg>
                                 <span class="text-xs font-medium">Esta aula não possui vídeo anexado.</span>
                             </div>
-                        @endif
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </div>
 
                     <!-- Detalhes e Descrição da Aula -->
                     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-3">
                         <div class="flex items-center gap-2">
                             <span class="px-3 py-1 text-[11px] font-medium text-gray-600 bg-gray-50 rounded-full border border-gray-100">
-                                {{ $aula->modulo->titulo ?? 'Módulo' }}
+                                <?php echo e($aula->modulo->titulo ?? 'Módulo'); ?>
+
                             </span>
                         </div>
-                        <h2 class="text-xl font-bold text-gray-900">{{ $aula->titulo }}</h2>
+                        <h2 class="text-xl font-bold text-gray-900"><?php echo e($aula->titulo); ?></h2>
                         <div class="text-xs text-gray-500 leading-relaxed space-y-2">
-                            {!! nl2br(e($aula->descricao ?? 'Sem descrição cadastrada para esta aula.')) !!}
+                            <?php echo nl2br(e($aula->descricao ?? 'Sem descrição cadastrada para esta aula.')); ?>
+
                         </div>
                     </div>
 
@@ -79,17 +90,17 @@
                 <div class="sticky bottom-0 left-0 right-0 z-20 bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-gray-100 shadow-lg flex items-center justify-between gap-4 max-w-6xl mx-auto w-full shrink-0">
 
                     <!-- Aula Anterior -->
-                    @if(isset($aulaAnterior) && $aulaAnterior)
-                    <a href="{{ route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaAnterior->id_aula ?? $aulaAnterior->id]) }}"
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($aulaAnterior) && $aulaAnterior): ?>
+                    <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaAnterior->id_aula ?? $aulaAnterior->id])); ?>"
                         class="py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                         Aula Anterior
                     </a>
-                    @else
+                    <?php else: ?>
                     <div class="w-24"></div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
                     <!-- Barra de Progresso do Vídeo -->
                     <div class="flex-1 max-w-xs flex flex-col items-center">
@@ -108,17 +119,17 @@
                     </div>
 
                     <!-- Próxima Aula -->
-                    @if(isset($proximaAula) && $proximaAula)
-                    <a href="{{ route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id]) }}"
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($proximaAula) && $proximaAula): ?>
+                    <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id])); ?>"
                         class="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors shadow-xs">
                         Próxima Aula
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
-                    @else
+                    <?php else: ?>
                     <div class="w-24"></div>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
             </main>
@@ -138,76 +149,76 @@
                 </div>
 
                 <div class="divide-y divide-gray-100 flex-1">
-                    @forelse($modulos as $index => $modulo)
-                    @php $modId = $modulo->id_modulo ?? $modulo->id; @endphp
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $modulos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $modulo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php $modId = $modulo->id_modulo ?? $modulo->id; ?>
                     <div>
 
                         <!-- Cabeçalho do Módulo -->
-                        <button @click="moduloAberto = (moduloAberto === {{ $modId }} ? null : {{ $modId }})"
+                        <button @click="moduloAberto = (moduloAberto === <?php echo e($modId); ?> ? null : <?php echo e($modId); ?>)"
                             class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
                             <div class="space-y-0.5">
-                                <span class="text-[10px] font-bold text-blue-600 uppercase">Módulo {{ $index + 1 }}</span>
-                                <h3 class="text-xs font-bold text-gray-800 line-clamp-1">{{ $modulo->titulo }}</h3>
+                                <span class="text-[10px] font-bold text-blue-600 uppercase">Módulo <?php echo e($index + 1); ?></span>
+                                <h3 class="text-xs font-bold text-gray-800 line-clamp-1"><?php echo e($modulo->titulo); ?></h3>
                             </div>
                             <svg class="w-4 h-4 text-gray-400 transform transition-transform"
-                                :class="moduloAberto === {{ $modId }} ? 'rotate-180' : ''"
+                                :class="moduloAberto === <?php echo e($modId); ?> ? 'rotate-180' : ''"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
 
                         <!-- Lista de Aulas do Módulo -->
-                        <div x-show="moduloAberto === {{ $modId }}" x-collapse class="bg-gray-50/50 divide-y divide-gray-100">
-                            @forelse($modulo->aulas as $itemAula)
-                            @php
+                        <div x-show="moduloAberto === <?php echo e($modId); ?>" x-collapse class="bg-gray-50/50 divide-y divide-gray-100">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_2 = true; $__currentLoopData = $modulo->aulas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemAula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
+                            <?php
                             $aulaItemId = $itemAula->id_aula ?? $itemAula->id;
                             $aulaAtualId = $aula->id_aula ?? $aula->id;
                             $eAulaAtual = $aulaItemId === $aulaAtualId;
                             $itemConcluida = $itemAula->progressos->first()?->concluido ?? false;
-                            @endphp
-                            <a href="{{ route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaItemId]) }}"
-                                id="item-aula-{{ $aulaItemId }}"
-                                class="flex items-center justify-between px-4 py-3 text-xs transition-colors {{ $eAulaAtual ? 'bg-blue-50/80 text-blue-600 font-bold border-l-4 border-blue-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}">
+                            ?>
+                            <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaItemId])); ?>"
+                                id="item-aula-<?php echo e($aulaItemId); ?>"
+                                class="flex items-center justify-between px-4 py-3 text-xs transition-colors <?php echo e($eAulaAtual ? 'bg-blue-50/80 text-blue-600 font-bold border-l-4 border-blue-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'); ?>">
 
                                 <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                                    <div id="icone-aula-{{ $aulaItemId }}">
-                                        @if($itemConcluida)
+                                    <div id="icone-aula-<?php echo e($aulaItemId); ?>">
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($itemConcluida): ?>
                                         <div class="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
-                                        @elseif($eAulaAtual)
+                                        <?php elseif($eAulaAtual): ?>
                                         <svg class="w-4 h-4 text-blue-600 shrink-0 fill-current" viewBox="0 0 24 24">
                                             <path d="M8 5v14l11-7z" />
                                         </svg>
-                                        @else
+                                        <?php else: ?>
                                         <div class="w-5 h-5 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center shrink-0">
                                             <svg class="w-2.5 h-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
                                                 <path d="M8 5v14l11-7z" />
                                             </svg>
                                         </div>
-                                        @endif
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                                     </div>
 
-                                    <span class="truncate">{{ $itemAula->titulo }}</span>
+                                    <span class="truncate"><?php echo e($itemAula->titulo); ?></span>
                                 </div>
 
-                                @if($eAulaAtual)
-                                <span id="badge-tocando-{{ $aulaItemId }}" class="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full shrink-0">Tocando</span>
-                                @endif
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($eAulaAtual): ?>
+                                <span id="badge-tocando-<?php echo e($aulaItemId); ?>" class="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full shrink-0">Tocando</span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </a>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
                             <div class="px-4 py-3 text-[11px] text-gray-400 italic">Nenhuma aula neste módulo.</div>
-                            @endforelse
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </div>
 
                     </div>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <div class="p-4 text-xs text-gray-400 text-center">
                         Nenhum módulo cadastrado neste curso.
                     </div>
-                    @endforelse
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
                 <!-- 📍 PASSO 3: MATERIAIS E DOWNLOADS DA SIDEBAR -->
@@ -219,14 +230,14 @@
                     <p class="text-[11px] text-gray-500 leading-relaxed">
                         Acesse os arquivos complementares e suporte desta aula para acompanhar o conteúdo.
                     </p>
-                    @if(!empty($aula->url_arquivo) || !empty($aula->material_apoio))
-                    <a href="{{ asset($aula->url_arquivo ?? $aula->material_apoio) }}" download target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline pt-1">
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($aula->url_arquivo) || !empty($aula->material_apoio)): ?>
+                    <a href="<?php echo e(asset($aula->url_arquivo ?? $aula->material_apoio)); ?>" download target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline pt-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Baixar Arquivo Anexo
                     </a>
-                    @endif
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
             </aside>
@@ -236,16 +247,16 @@
 
     <!-- SCRIPT DE REPRODUÇÃO E PROGRESSO -->
     <script>
-        @php
+        <?php
             $progressoAtual = $progresso ?? $aula->progressos->first();
-        @endphp
+        ?>
 
         let player;
-        let maxTimeWatched = {{ $progressoAtual->segundo_atual ?? 0 }};
-        let percentWatched = {{ $progressoAtual->porcentagem ?? 0 }};
-        const aulaId = {{ $aula->id_aula ?? $aula->id }};
-        const aulaJaConcluida = {{ ($progressoAtual->concluido ?? false) ? 'true' : 'false' }};
-        const proximaAulaUrl = @json(isset($proximaAula) && $proximaAula ? route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id]) : null);
+        let maxTimeWatched = <?php echo e($progressoAtual->segundo_atual ?? 0); ?>;
+        let percentWatched = <?php echo e($progressoAtual->porcentagem ?? 0); ?>;
+        const aulaId = <?php echo e($aula->id_aula ?? $aula->id); ?>;
+        const aulaJaConcluida = <?php echo e(($progressoAtual->concluido ?? false) ? 'true' : 'false'); ?>;
+        const proximaAulaUrl = <?php echo json_encode(isset($proximaAula) && $proximaAula ? route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id]) : null) ?>;
 
         let updateInterval;
         let aulaRedirecionada = false;
@@ -416,4 +427,13 @@
     
     <!-- API do YouTube carregada após a declaração do script JS -->
     <script src="https://www.youtube.com/iframe_api"></script>
-</x-aluno-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale4ebc9ed57c5009c9a50770282541134)): ?>
+<?php $attributes = $__attributesOriginale4ebc9ed57c5009c9a50770282541134; ?>
+<?php unset($__attributesOriginale4ebc9ed57c5009c9a50770282541134); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale4ebc9ed57c5009c9a50770282541134)): ?>
+<?php $component = $__componentOriginale4ebc9ed57c5009c9a50770282541134; ?>
+<?php unset($__componentOriginale4ebc9ed57c5009c9a50770282541134); ?>
+<?php endif; ?><?php /**PATH C:\Users\otvoa\Downloads\GearUp-postgresql\resources\views/aluno/aulas/show.blade.php ENDPATH**/ ?>
