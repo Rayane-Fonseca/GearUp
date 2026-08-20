@@ -15,11 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'perfil' => PerfilMiddleware::class,
         ]);
-
-        // O Render roda a aplicação atrás de um proxy reverso.
-        // Sem isso, o Symfony/Laravel não sabe confiar nos headers
-        // X-Forwarded-* e pode lançar "Invalid URI: Host is malformed".
-        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
