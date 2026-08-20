@@ -7983,3 +7983,19 @@ connection to server at \"ep-floral-unit-axkjcra3.c-4.us-east-2.aws.neon.tech\" 
 #49 C:/Users/otvoa/Downloads/GearUp-postgresql/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
 #50 {main}
 "} 
+[2026-08-20 16:27:31] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/Users/otvoa/Downloads/GearUp-postgresql/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-20 16:28:37] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/Users/otvoa/Downloads/GearUp-postgresql/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-20 16:29:42] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/Users/otvoa/Downloads/GearUp-postgresql/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:67)
+[stacktrace]
+#0 {main}
+"} 
+[2026-08-20 16:30:46] local.ERROR: Maximum execution time of 30 seconds exceeded {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Maximum execution time of 30 seconds exceeded at C:/Users/otvoa/Downloads/GearUp-postgresql/vendor/laravel/framework/src/Illuminate/Database/Connectors/Connector.php:67)
+[stacktrace]
+#0 {main}
+"} 
