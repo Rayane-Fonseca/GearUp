@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('gestao')
             ->path('gestao')
             ->login()
-            ->brandLogo(asset('images/fundo.jpeg'))
+            ->brandLogo(asset('images/Logo.png'))
             ->brandLogoHeight('3rem')
             ->colors([
                 'primary' => Color::Blue,
