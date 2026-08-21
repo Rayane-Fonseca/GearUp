@@ -17,7 +17,7 @@
         <div class="flex items-center justify-between">
             <p class="text-sm text-gray-500">{{ $cursos->count() }} cursos cadastrados</p>
             <button @click="abrirNovo()" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 flex items-center gap-2">
-                <span>Novo curso</span>
+                <span>+ Novo curso</span>
             </button>
         </div>
 

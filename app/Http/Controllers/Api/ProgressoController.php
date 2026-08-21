@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\GerarPdfCertificadoJob;
 use App\Models\Aula;
+use App\Models\AulaProgresso;
+use App\Models\Certificado;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Progresso;
@@ -97,45 +100,133 @@ class ProgressoController extends Controller
             ]
         ]);
     }
+    /**
+     * Salva o progresso de reprodução da aula (tempo assistido) para o aluno logado,
+     * permitindo retomar o vídeo de onde parou, e recalcula o progresso real do curso.
+     */
     public function atualizarProgresso(Request $request)
     {
         $validated = $request->validate([
-            'aula_id'       => 'required|exists:aulas,id',
-            'tempo_atual'   => 'required|numeric', // em segundos
-            'duracao_total' => 'required|numeric', // em segundos
+            'aula_id'       => 'required|integer|exists:aulas,id',
+            'tempo_atual'   => 'required|numeric|min:0', // em segundos
+            'duracao_total' => 'required|numeric|min:0', // em segundos
         ]);
 
-        $tempoAtual = $validated['tempo_atual'];
-        $duracaoTotal = $validated['duracao_total'];
+        $usuarioId = auth()->id();
+        $aula = Aula::with('modulo')->findOrFail($validated['aula_id']);
+        $cursoId = $aula->modulo->id_curso ?? null;
 
-        // Calcula a porcentagem
-        $porcentagem = ($duracaoTotal > 0)
-            ? round(($tempoAtual / $duracaoTotal) * 100, 2)
-            : 0;
-
-        if ($porcentagem > 100) {
-            $porcentagem = 100;
+        $duracaoTotal = (int) round($validated['duracao_total']);
+        $tempoAtual = (int) round($validated['tempo_atual']);
+        // Nunca deixa o tempo assistido ultrapassar a duração total do vídeo
+        if ($duracaoTotal > 0 && $tempoAtual > $duracaoTotal) {
+            $tempoAtual = $duracaoTotal;
         }
 
-        // Define como concluído se ultrapassar 90%
-        $concluido = $porcentagem >= 90;
+        $porcentagem = $duracaoTotal > 0
+            ? min(100, (int) round(($tempoAtual / $duracaoTotal) * 100))
+            : 0;
 
-        $progresso = Progresso::updateOrCreate(
-            [
-                'usuario_id' => auth()->id(),
-                'aula_id'    => $validated['aula_id'],
-            ],
-            [
-                'tempo_assistido' => $tempoAtual,
-                'porcentagem'     => $porcentagem,
-                'concluido'       => $concluido,
-            ]
-        );
+        // Considera a aula concluída ao atingir 90% do vídeo (evita travar em segundos finais)
+        $novaConclusao = $porcentagem >= 90;
+
+        $aulaProgresso = AulaProgresso::firstOrNew([
+            'usuario_id' => $usuarioId,
+            'aula_id'    => $aula->id,
+        ]);
+
+        // Uma aula já concluída não "desconclui" caso o aluno retroceda o vídeo
+        $concluido = $aulaProgresso->concluido || $novaConclusao;
+
+        $aulaProgresso->curso_id = $cursoId;
+        $aulaProgresso->tempo_assistido = $tempoAtual;
+        $aulaProgresso->duracao_total = $duracaoTotal;
+        // Também não deixa a porcentagem exibida retroceder após a aula já ter sido concluída
+        $aulaProgresso->porcentagem = $aulaProgresso->concluido ? max($aulaProgresso->porcentagem, $porcentagem) : $porcentagem;
+        $aulaProgresso->concluido = $concluido;
+        if ($concluido && !$aulaProgresso->concluido_em) {
+            $aulaProgresso->concluido_em = now();
+        }
+        $aulaProgresso->save();
+
+        $resultadoCurso = $cursoId
+            ? $this->recalcularProgressoDoCurso($usuarioId, $cursoId)
+            : ['porcentagem_curso' => 0, 'curso_concluido' => false, 'certificado_liberado' => false];
 
         return response()->json([
-            'sucesso'     => true,
-            'porcentagem' => $progresso->porcentagem,
-            'concluido'   => $progresso->concluido,
+            'sucesso'              => true,
+            'porcentagem'          => $aulaProgresso->porcentagem,
+            'concluido'            => $aulaProgresso->concluido,
+            'tempo_assistido'      => $aulaProgresso->tempo_assistido,
+            'porcentagem_curso'    => $resultadoCurso['porcentagem_curso'],
+            'curso_concluido'      => $resultadoCurso['curso_concluido'],
+            'certificado_liberado' => $resultadoCurso['certificado_liberado'],
         ]);
+    }
+
+    /**
+     * Recalcula o progresso consolidado do curso (tabela "progressos") a partir do
+     * progresso individual de cada aula e, ao atingir 100%, libera o certificado
+     * do aluno imediatamente (sem precisar de solicitação manual).
+     */
+    private function recalcularProgressoDoCurso(int $usuarioId, int $cursoId): array
+    {
+        $totalAulas = Aula::whereHas('modulo', function ($query) use ($cursoId) {
+            $query->where('id_curso', $cursoId);
+        })->count();
+
+        $progressosDasAulas = AulaProgresso::where('usuario_id', $usuarioId)
+            ->where('curso_id', $cursoId)
+            ->get(['porcentagem', 'concluido']);
+
+        // Soma a porcentagem assistida de cada aula (aulas ainda não iniciadas contam como 0%),
+        // assim o progresso do curso já sobe conforme o aluno vai assistindo, sem esperar concluir.
+        $somaPorcentagens = $progressosDasAulas->sum('porcentagem');
+        $aulasConcluidas = $progressosDasAulas->where('concluido', true)->count();
+
+        $porcentagemCurso = $totalAulas > 0
+            ? (int) round($somaPorcentagens / $totalAulas)
+            : 0;
+
+        // O curso só é considerado "concluído" (libera certificado) quando TODAS as aulas
+        // foram de fato concluídas, mesmo que a porcentagem já esteja exibindo perto de 100%.
+        $cursoConcluido = $totalAulas > 0 && $aulasConcluidas >= $totalAulas;
+        if ($cursoConcluido) {
+            $porcentagemCurso = 100;
+        }
+
+        $progresso = Progresso::firstOrNew([
+            'usuario_id' => $usuarioId,
+            'curso_id'   => $cursoId,
+        ]);
+
+        $jaEstavaConcluido = $progresso->exists && $progresso->concluido;
+
+        $progresso->porcentagem = $porcentagemCurso;
+        $progresso->concluido = $cursoConcluido;
+        if ($cursoConcluido && !$progresso->concluido_em) {
+            $progresso->concluido_em = now();
+        }
+        $progresso->save();
+
+        $certificadoLiberado = false;
+
+        // Libera (gera) o certificado automaticamente assim que o curso é concluído
+        if ($cursoConcluido && !$jaEstavaConcluido) {
+            $jaTemCertificado = Certificado::where('id_usuario', $usuarioId)
+                ->where('id_curso', $cursoId)
+                ->exists();
+
+            if (!$jaTemCertificado) {
+                GerarPdfCertificadoJob::dispatchSync($usuarioId, $cursoId);
+                $certificadoLiberado = true;
+            }
+        }
+
+        return [
+            'porcentagem_curso'    => $porcentagemCurso,
+            'curso_concluido'      => $cursoConcluido,
+            'certificado_liberado' => $certificadoLiberado,
+        ];
     }
 }

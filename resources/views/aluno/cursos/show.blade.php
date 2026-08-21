@@ -31,6 +31,14 @@
                         <span class="px-3 py-1 text-[11px] font-medium text-gray-600 bg-gray-50 rounded-full border border-gray-100">
                             {{ $curso->categoria ?? 'Geral' }}
                         </span>
+                        @if($obrigatorio)
+                        <span class="px-3 py-1 text-[11px] font-bold uppercase tracking-wide bg-red-600 text-white rounded-full flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            Obrigatório para sua área
+                        </span>
+                        @endif
                         <span class="text-xs text-gray-400 flex items-center gap-1 font-medium">
                             <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

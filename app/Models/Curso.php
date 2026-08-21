@@ -51,6 +51,19 @@ class Curso extends Model
         return 'id_curso';
     }
 
+    /**
+     * Um curso é obrigatório para o usuário quando a área de atuação dele
+     * (usuarios.area) corresponde à categoria do curso (cursos.categoria).
+     */
+    public function ehObrigatorioPara(?Usuario $usuario): bool
+    {
+        if (!$usuario || !$usuario->area) {
+            return false;
+        }
+
+        return trim(mb_strtolower($this->categoria)) === trim(mb_strtolower($usuario->area));
+    }
+
     public const CORES_CATEGORIAS = [
         'DevOps' => '#9B5DE5',
         'Cloud Computing' => '#CA7FB0',

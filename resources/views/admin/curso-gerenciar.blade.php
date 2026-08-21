@@ -33,7 +33,7 @@
             <a href="{{ route('admin.cursos') }}" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors">
                 Voltar para cursos
             </a>
-            <button @click="abrirNovoModulo()" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors">Novo módulo</button>
+            <button @click="abrirNovoModulo()" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition-colors">+ Novo módulo</button>
         </div>
 
         @if($curso->modulos->isEmpty())

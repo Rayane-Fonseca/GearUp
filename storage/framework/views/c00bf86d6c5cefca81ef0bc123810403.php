@@ -8,8 +8,14 @@
 <?php $attributes = $attributes->except(\App\View\Components\AlunoLayout::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['titulo-pagina' => ''.e($aula->titulo).'','subtitulo-pagina' => ''.e($curso->titulo).'']); ?>
-    <div x-data="{ sidebarOpen: true, moduloAberto: <?php echo e($aula->modulo_id ?? $aula->id_modulo ?? 'null'); ?> }" class="h-[calc(100vh-4rem)] flex flex-col bg-slate-50 text-gray-800 overflow-hidden">
+    <?php
+        $moduloAtivoId = $aula->modulo->id_modulo ?? $aula->modulo->id ?? $aula->id_modulo ?? $aula->modulo_id ?? null;
+        $aulaAtualId = $aula->id_aula ?? $aula->id;
+        $usuarioIdAuth = auth()->user()->id_usuario ?? auth()->id();
+    ?>
 
+    <div x-data="{ sidebarOpen: true, moduloAberto: <?php echo e(json_encode($moduloAtivoId)); ?> }" class="h-[calc(100vh-4rem)] flex flex-col bg-slate-50 text-gray-800 overflow-hidden">
+        
         <!-- Header Superior do Player -->
         <header class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between shadow-xs shrink-0 z-10">
             <div class="flex items-center gap-4">
@@ -23,7 +29,7 @@
             <!-- Botão de Ocultar/Exibir Sidebar -->
             <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-3 py-2 rounded-xl transition-colors">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
                 <span x-text="sidebarOpen ? 'Ocultar Conteúdo' : 'Ver Conteúdo'"></span>
             </button>
@@ -31,29 +37,30 @@
 
         <!-- Conteúdo Principal + Sidebar -->
         <div class="flex-1 flex overflow-hidden relative">
-
+            
             <!-- ÁREA DO PLAYER / CONTEÚDO -->
             <main class="flex-1 flex flex-col overflow-y-auto p-6 relative space-y-6">
                 <div class="max-w-6xl mx-auto w-full space-y-6 flex-1">
-
+                    
                     <!-- Container do Player -->
                     <div class="relative w-full h-[480px] lg:h-[560px] bg-gray-900 rounded-2xl overflow-hidden shadow-sm border border-gray-100 mx-auto">
-                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($aula->url_video)): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($aula->url_video): ?>
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Str::contains($aula->url_video, ['youtube.com', 'youtu.be'])): ?>
                                 <?php
-                                    preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/', $aula->url_video, $matches);
-                                    $youtubeId = $matches[1] ?? null;
+                                    $srcYoutube = Str::contains($aula->url_video, 'embed')
+                                        ? $aula->url_video
+                                        : 'https://www.youtube.com/embed/' . Str::afterLast($aula->url_video, '/');
+                                    $srcYoutube .= (Str::contains($srcYoutube, '?') ? '&' : '?') . 'enablejsapi=1';
                                 ?>
-
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($youtubeId): ?>
-                                    <div id="youtube-player" data-video-id="<?php echo e($youtubeId); ?>" class="w-full h-full"></div>
-                                <?php else: ?>
-                                    <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-900 p-6 text-center">
-                                        <span class="text-xs font-medium text-red-400">URL do YouTube inválida ou não reconhecida.</span>
-                                    </div>
-                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                <iframe id="player-video-youtube" class="w-full h-full" 
+                                        src="<?php echo e($srcYoutube); ?>" 
+                                        title="<?php echo e($aula->titulo); ?>" 
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                </iframe>
                             <?php else: ?>
-                                <video id="html5-player" class="w-full h-full object-contain" controls controlsList="nodownload">
+                                <video id="player-video-html5" class="w-full h-full object-contain" controls controlsList="nodownload">
                                     <source src="<?php echo e($aula->url_video); ?>" type="video/mp4">
                                     Seu navegador não suporta reprodução de vídeos.
                                 </video>
@@ -61,12 +68,30 @@
                         <?php else: ?>
                             <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-900 p-6 text-center">
                                 <svg class="w-14 h-14 mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <span class="text-xs font-medium">Esta aula não possui vídeo anexado.</span>
                             </div>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+
+                    <!-- Barra de Progresso da Aula -->
+                    <?php
+                        $progressoInicial = $progressoAula->porcentagem ?? 0;
+                        $concluidaInicial = ($progressoAula->concluido ?? false) || $progressoInicial >= 90;
+                    ?>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span id="chip-status-aula" class="px-2.5 py-1 text-[10px] font-semibold rounded-full border <?php echo e($concluidaInicial ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-blue-50 text-blue-600 border-blue-100'); ?>">
+                                <?php echo e($concluidaInicial ? 'Aula concluída' : 'Em andamento'); ?>
+
+                            </span>
+                            <span id="texto-progresso-aula" class="text-xs font-semibold text-gray-500"><?php echo e(round($progressoInicial)); ?>%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div id="barra-progresso-aula" class="h-2 rounded-full transition-all duration-300 <?php echo e($concluidaInicial ? 'bg-emerald-500' : 'bg-blue-600'); ?>" style="width: <?php echo e($progressoInicial); ?>%"></div>
+                        </div>
                     </div>
 
                     <!-- Detalhes e Descrição da Aula -->
@@ -86,157 +111,121 @@
 
                 </div>
 
-                <!-- BARRA FIXA/STICKY NO RODAPÉ DO PLAYER -->
+                <!-- BARRA FIXA NO RODAPÉ -->
                 <div class="sticky bottom-0 left-0 right-0 z-20 bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-gray-100 shadow-lg flex items-center justify-between gap-4 max-w-6xl mx-auto w-full shrink-0">
-
-                    <!-- Aula Anterior -->
+                    
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($aulaAnterior) && $aulaAnterior): ?>
-                    <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaAnterior->id_aula ?? $aulaAnterior->id])); ?>"
-                        class="py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Aula Anterior
-                    </a>
+                        <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaAnterior->id_aula ?? $aulaAnterior->id])); ?>" 
+                           class="py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Aula Anterior
+                        </a>
                     <?php else: ?>
-                    <div class="w-24"></div>
+                        <div class="w-24"></div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-                    <!-- Barra de Progresso do Vídeo -->
-                    <div class="flex-1 max-w-xs flex flex-col items-center">
-                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                            <div id="progress-bar" class="bg-blue-600 h-3 text-[10px] font-medium text-blue-100 text-center leading-none rounded-full transition-all duration-300" style="width: 0%">
-                                0%
-                            </div>
-                        </div>
-
-                        <div id="status-concluido" class="mt-1 text-xs text-emerald-600 font-bold hidden flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Aula Concluída!
-                        </div>
-                    </div>
-
-                    <!-- Próxima Aula -->
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($proximaAula) && $proximaAula): ?>
-                    <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id])); ?>"
-                        class="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors shadow-xs">
-                        Próxima Aula
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
+                        <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id])); ?>" 
+                           class="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors shadow-xs">
+                            Próxima Aula
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                     <?php else: ?>
-                    <div class="w-24"></div>
+                        <div class="w-24"></div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
             </main>
 
             <!-- SIDEBAR LATERAL DE MÓDULOS -->
-            <aside x-show="sidebarOpen"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="translate-x-full"
-                x-transition:enter-end="translate-x-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="translate-x-0"
-                x-transition:leave-end="translate-x-full"
-                class="w-80 lg:w-96 bg-white border-l border-gray-100 flex flex-col h-full overflow-y-auto shadow-sm shrink-0">
-
+            <aside x-show="sidebarOpen" 
+                   x-transition:enter="transition ease-out duration-200"
+                   x-transition:enter-start="translate-x-full"
+                   x-transition:enter-end="translate-x-0"
+                   x-transition:leave="transition ease-in duration-150"
+                   x-transition:leave-start="translate-x-0"
+                   x-transition:leave-end="translate-x-full"
+                   class="w-80 lg:w-96 bg-white border-l border-gray-100 flex flex-col h-full overflow-y-auto shadow-sm shrink-0">
+                
                 <div class="p-4 border-b border-gray-100 font-bold text-gray-900 text-sm">
                     Conteúdo do Curso
                 </div>
 
-                <div class="divide-y divide-gray-100 flex-1">
+                <div class="divide-y divide-gray-100">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $modulos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $modulo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <?php $modId = $modulo->id_modulo ?? $modulo->id; ?>
-                    <div>
-
-                        <!-- Cabeçalho do Módulo -->
-                        <button @click="moduloAberto = (moduloAberto === <?php echo e($modId); ?> ? null : <?php echo e($modId); ?>)"
-                            class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
-                            <div class="space-y-0.5">
-                                <span class="text-[10px] font-bold text-blue-600 uppercase">Módulo <?php echo e($index + 1); ?></span>
-                                <h3 class="text-xs font-bold text-gray-800 line-clamp-1"><?php echo e($modulo->titulo); ?></h3>
-                            </div>
-                            <svg class="w-4 h-4 text-gray-400 transform transition-transform"
-                                :class="moduloAberto === <?php echo e($modId); ?> ? 'rotate-180' : ''"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        <!-- Lista de Aulas do Módulo -->
-                        <div x-show="moduloAberto === <?php echo e($modId); ?>" x-collapse class="bg-gray-50/50 divide-y divide-gray-100">
-                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_2 = true; $__currentLoopData = $modulo->aulas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemAula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
-                            <?php
-                            $aulaItemId = $itemAula->id_aula ?? $itemAula->id;
-                            $aulaAtualId = $aula->id_aula ?? $aula->id;
-                            $eAulaAtual = $aulaItemId === $aulaAtualId;
-                            $itemConcluida = $itemAula->progressos->first()?->concluido ?? false;
-                            ?>
-                            <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaItemId])); ?>"
-                                id="item-aula-<?php echo e($aulaItemId); ?>"
-                                class="flex items-center justify-between px-4 py-3 text-xs transition-colors <?php echo e($eAulaAtual ? 'bg-blue-50/80 text-blue-600 font-bold border-l-4 border-blue-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'); ?>">
-
-                                <div class="flex items-center gap-2.5 min-w-0 pr-2">
-                                    <div id="icone-aula-<?php echo e($aulaItemId); ?>">
-                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($itemConcluida): ?>
-                                        <div class="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
-                                        <?php elseif($eAulaAtual): ?>
-                                        <svg class="w-4 h-4 text-blue-600 shrink-0 fill-current" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z" />
-                                        </svg>
-                                        <?php else: ?>
-                                        <div class="w-5 h-5 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center shrink-0">
-                                            <svg class="w-2.5 h-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
-                                                <path d="M8 5v14l11-7z" />
-                                            </svg>
-                                        </div>
-                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                    </div>
-
-                                    <span class="truncate"><?php echo e($itemAula->titulo); ?></span>
+                        <?php 
+                            $modId = $modulo->id_modulo ?? $modulo->id; 
+                        ?>
+                        <div>
+                            <button @click="moduloAberto = (moduloAberto === <?php echo e(json_encode($modId)); ?> ? null : <?php echo e(json_encode($modId)); ?>)" 
+                                    class="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors">
+                                <div class="space-y-0.5">
+                                    <span class="text-[10px] font-bold text-blue-600 uppercase">Módulo <?php echo e($index + 1); ?></span>
+                                    <h3 class="text-xs font-bold text-gray-800 line-clamp-1"><?php echo e($modulo->titulo); ?></h3>
                                 </div>
+                                <svg class="w-4 h-4 text-gray-400 transform transition-transform" 
+                                     :class="moduloAberto === <?php echo e(json_encode($modId)); ?> ? 'rotate-180' : ''" 
+                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
 
-                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($eAulaAtual): ?>
-                                <span id="badge-tocando-<?php echo e($aulaItemId); ?>" class="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full shrink-0">Tocando</span>
+                            <div x-show="moduloAberto === <?php echo e(json_encode($modId)); ?>" x-collapse class="bg-gray-50/50 divide-y divide-gray-100">
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_2 = true; $__currentLoopData = $modulo->aulas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $itemAula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
+                                    <?php 
+                                        $itemAulaId = $itemAula->id_aula ?? $itemAula->id;
+                                        $eAulaAtual = (int)$itemAulaId === (int)$aulaAtualId;
+                                        
+                                        // CORREÇÃO SIDEBAR: Busca o progresso específico deste usuário nesta aula
+                                        $progItem = $itemAula->progressos
+                                            ->where('usuario_id', $usuarioIdAuth)
+                                            ->first();
+
+                                        $itemConcluida = $progItem && ($progItem->concluido || $progItem->porcentagem >= 90);
+                                    ?>
+                                    <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $itemAulaId])); ?>" 
+                                       class="flex items-center justify-between px-4 py-3 text-xs transition-colors <?php echo e($eAulaAtual ? 'bg-blue-50/80 text-blue-600 font-bold border-l-4 border-blue-600' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'); ?>">
+                                        
+                                        <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($itemConcluida): ?>
+                                                <div class="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            <?php elseif($eAulaAtual): ?>
+                                                <svg class="w-4 h-4 text-blue-600 shrink-0 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z" />
+                                                </svg>
+                                            <?php else: ?>
+                                                <div class="w-5 h-5 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center shrink-0">
+                                                    <svg class="w-2.5 h-2.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                                                        <path d="M8 5v14l11-7z" />
+                                                    </svg>
+                                                </div>
+                                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
+                                            <span class="truncate"><?php echo e($itemAula->titulo); ?></span>
+                                        </div>
+
+                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($eAulaAtual): ?>
+                                            <span class="text-[10px] font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full shrink-0">Tocando</span>
+                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                    </a>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
+                                    <div class="px-4 py-3 text-[11px] text-gray-400 italic">Nenhuma aula neste módulo.</div>
                                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                            </a>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
-                            <div class="px-4 py-3 text-[11px] text-gray-400 italic">Nenhuma aula neste módulo.</div>
-                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </div>
+
                         </div>
-
-                    </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <div class="p-4 text-xs text-gray-400 text-center">
-                        Nenhum módulo cadastrado neste curso.
-                    </div>
-                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                </div>
-
-                <!-- 📍 PASSO 3: MATERIAIS E DOWNLOADS DA SIDEBAR -->
-                <div class="p-4 bg-gray-50 border-t border-gray-100 space-y-2 mt-auto">
-                    <div class="flex items-center gap-2 text-xs font-bold text-blue-600">
-                        <span class="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700 border border-blue-200">3</span>
-                        <span>Passo 3: Materiais e Downloads</span>
-                    </div>
-                    <p class="text-[11px] text-gray-500 leading-relaxed">
-                        Acesse os arquivos complementares e suporte desta aula para acompanhar o conteúdo.
-                    </p>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(!empty($aula->url_arquivo) || !empty($aula->material_apoio)): ?>
-                    <a href="<?php echo e(asset($aula->url_arquivo ?? $aula->material_apoio)); ?>" download target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline pt-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Baixar Arquivo Anexo
-                    </a>
+                        <div class="p-4 text-xs text-gray-400 text-center">
+                            Nenhum módulo cadastrado neste curso.
+                        </div>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
@@ -245,188 +234,149 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE REPRODUÇÃO E PROGRESSO -->
+    
     <script>
-        <?php
-            $progressoAtual = $progresso ?? $aula->progressos->first();
-        ?>
+    document.addEventListener('DOMContentLoaded', function () {
+        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const AULA_ID = <?php echo e((int) ($aula->id_aula ?? $aula->id)); ?>;
+        const TEMPO_INICIAL = <?php echo e((float) ($progressoAula->tempo_assistido ?? 0)); ?>;
+        const URL_ATUALIZAR = "<?php echo e(route('progresso.atualizar')); ?>";
+        const URL_CERTIFICADOS = "<?php echo e(route('aluno.certificados')); ?>";
 
-        let player;
-        let maxTimeWatched = <?php echo e($progressoAtual->segundo_atual ?? 0); ?>;
-        let percentWatched = <?php echo e($progressoAtual->porcentagem ?? 0); ?>;
-        const aulaId = <?php echo e($aula->id_aula ?? $aula->id); ?>;
-        const aulaJaConcluida = <?php echo e(($progressoAtual->concluido ?? false) ? 'true' : 'false'); ?>;
-        const proximaAulaUrl = <?php echo json_encode(isset($proximaAula) && $proximaAula ? route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $proximaAula->id_aula ?? $proximaAula->id]) : null) ?>;
+        let concluidaLocal = <?php echo e((($progressoAula->concluido ?? false) || ($progressoAula->porcentagem ?? 0) >= 90) ? 'true' : 'false'); ?>;
+        let ultimoEnvio = 0;
 
-        let updateInterval;
-        let aulaRedirecionada = false;
+        const barraProgresso = document.getElementById('barra-progresso-aula');
+        const textoProgresso = document.getElementById('texto-progresso-aula');
+        const chipStatus = document.getElementById('chip-status-aula');
 
-        // Configuração para Player HTML5 padrão (.mp4)
-        document.addEventListener('DOMContentLoaded', function() {
-            const videoElem = document.getElementById('html5-player');
-            if (videoElem) {
-                if (maxTimeWatched > 0 && !aulaJaConcluida) {
-                    videoElem.currentTime = maxTimeWatched;
-                }
-                updateProgressBar(percentWatched);
+        function atualizarBarraUI(porcentagem, concluida) {
+            porcentagem = Math.max(0, Math.min(100, Math.round(porcentagem || 0)));
 
-                videoElem.addEventListener('timeupdate', function() {
-                    trackHtml5Progress(videoElem);
-                });
+            if (barraProgresso) {
+                barraProgresso.style.width = porcentagem + '%';
+                barraProgresso.classList.toggle('bg-emerald-500', concluida);
+                barraProgresso.classList.toggle('bg-blue-600', !concluida);
             }
-        });
-
-        function trackHtml5Progress(videoElem) {
-            const currentTime = videoElem.currentTime;
-            const duration = videoElem.duration;
-
-            if (!duration) return;
-
-            if (currentTime > maxTimeWatched) {
-                maxTimeWatched = currentTime;
+            if (textoProgresso) {
+                textoProgresso.textContent = porcentagem + '%';
             }
-
-            percentWatched = Math.min(100, Math.round((maxTimeWatched / duration) * 100));
-            updateProgressBar(percentWatched);
-
-            if (percentWatched >= 100 && !aulaRedirecionada) {
-                aulaRedirecionada = true;
-                salvarProgresso(duration, 100, true);
-            } else if (Math.floor(currentTime) % 5 === 0) {
-                salvarProgresso(maxTimeWatched, percentWatched, false);
+            if (chipStatus) {
+                chipStatus.textContent = concluida ? 'Aula concluída' : 'Em andamento';
+                chipStatus.className = 'px-2.5 py-1 text-[10px] font-semibold rounded-full border ' + 
+                    (concluida ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-blue-50 text-blue-600 border-blue-100');
             }
         }
 
-        // Funções para Player do YouTube
-        function onYouTubeIframeAPIReady() {
-            const playerElem = document.getElementById('youtube-player');
-            if (!playerElem) return;
+        function salvarProgresso(tempoAtual, duracaoTotal, forcar) {
+            if (!duracaoTotal || duracaoTotal <= 0 || isNaN(tempoAtual)) return;
 
-            const videoId = playerElem.dataset.videoId;
-            if (!videoId) return;
+            const pctCliente = Math.min(100, (tempoAtual / duracaoTotal) * 100);
+            const jaConcluiu = concluidaLocal || pctCliente >= 90;
 
-            player = new YT.Player('youtube-player', {
-                videoId: videoId,
-                playerVars: {
-                    'controls': 1,
-                    'rel': 0,
-                    'disablekb': 1
+            atualizarBarraUI(pctCliente, jaConcluiu);
+
+            const agora = Date.now();
+            // Permite o envio se forçar (pause/ended) ou se já passaram 3 segundos
+            if (!forcar && (agora - ultimoEnvio) < 3000) return;
+            ultimoEnvio = agora;
+
+            fetch(URL_ATUALIZAR, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
                 },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
+                body: JSON.stringify({
+                    aula_id: AULA_ID,
+                    tempo_atual: tempoAtual,
+                    duracao_total: duracaoTotal,
+                }),
+            })
+            .then(res => res.json())
+            .then(dados => {
+                if (!dados.sucesso) return;
+
+                const pctFinal = dados.porcentagem !== undefined ? dados.porcentagem : pctCliente;
+                const estaConcluido = dados.concluido !== undefined ? dados.concluido : jaConcluiu;
+
+                atualizarBarraUI(pctFinal, estaConcluido);
+
+                if (estaConcluido) {
+                    concluidaLocal = true;
                 }
+            })
+            .catch(() => {});
+        }
+
+        atualizarBarraUI(<?php echo e((float) ($progressoAula->porcentagem ?? 0)); ?>, concluidaLocal);
+
+        // --- PLAYER HTML5 ---
+        const videoEl = document.getElementById('player-video-html5');
+        if (videoEl) {
+            videoEl.addEventListener('loadedmetadata', function () {
+                if (TEMPO_INICIAL > 0 && TEMPO_INICIAL < (videoEl.duration - 2)) {
+                    videoEl.currentTime = TEMPO_INICIAL;
+                }
+            });
+            videoEl.addEventListener('timeupdate', function () {
+                salvarProgresso(videoEl.currentTime, videoEl.duration, false);
+            });
+            videoEl.addEventListener('pause', function () {
+                salvarProgresso(videoEl.currentTime, videoEl.duration, true);
+            });
+            videoEl.addEventListener('ended', function () {
+                salvarProgresso(videoEl.duration, videoEl.duration, true);
             });
         }
 
-        function onPlayerReady(event) {
-            if (aulaJaConcluida) {
-                const desejaReassistir = confirm("Você já concluiu esta aula. Deseja assistir novamente?");
-                if (!desejaReassistir) {
-                    if (proximaAulaUrl) {
-                        window.location.href = proximaAulaUrl;
-                    } else {
-                        alert("Você já concluiu todas as aulas deste curso!");
+        // --- PLAYER YOUTUBE EMBED ---
+        const iframeYoutube = document.getElementById('player-video-youtube');
+        if (iframeYoutube) {
+            function inicializarYTPlayer() {
+                let intervaloSalvar = null;
+
+                const player = new YT.Player('player-video-youtube', {
+                    events: {
+                        onReady: function (evento) {
+                            if (TEMPO_INICIAL > 0) {
+                                evento.target.seekTo(TEMPO_INICIAL, true);
+                            }
+                        },
+                        onStateChange: function (evento) {
+                            if (intervaloSalvar) {
+                                clearInterval(intervaloSalvar);
+                                intervaloSalvar = null;
+                            }
+
+                            if (evento.data === YT.PlayerState.PLAYING) {
+                                intervaloSalvar = setInterval(function () {
+                                    if (player && player.getCurrentTime) {
+                                        salvarProgresso(player.getCurrentTime(), player.getDuration(), false);
+                                    }
+                                }, 3000);
+                            } else if (evento.data === YT.PlayerState.PAUSED) {
+                                salvarProgresso(player.getCurrentTime(), player.getDuration(), true);
+                            } else if (evento.data === YT.PlayerState.ENDED) {
+                                salvarProgresso(player.getDuration(), player.getDuration(), true);
+                            }
+                        }
                     }
-                    return;
-                }
+                });
             }
 
-            if (maxTimeWatched > 0 && !aulaJaConcluida) {
-                player.seekTo(maxTimeWatched);
-            }
-            updateProgressBar(percentWatched);
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.PLAYING) {
-                updateInterval = setInterval(trackProgress, 1000);
+            if (window.YT && window.YT.Player) {
+                inicializarYTPlayer();
             } else {
-                clearInterval(updateInterval);
+                const scriptTag = document.createElement('script');
+                scriptTag.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(scriptTag);
+                window.onYouTubeIframeAPIReady = inicializarYTPlayer;
             }
         }
-
-        function trackProgress() {
-            if (!player || !player.getCurrentTime) return;
-
-            const currentTime = player.getCurrentTime();
-            const duration = player.getDuration();
-
-            if (!duration) return;
-
-            if (currentTime > maxTimeWatched) {
-                maxTimeWatched = currentTime;
-            }
-
-            percentWatched = Math.min(100, Math.round((maxTimeWatched / duration) * 100));
-            updateProgressBar(percentWatched);
-
-            if (percentWatched >= 100 && !aulaRedirecionada) {
-                aulaRedirecionada = true;
-                clearInterval(updateInterval);
-                salvarProgresso(duration, 100, true);
-                return;
-            }
-
-            if (Math.floor(currentTime) % 5 === 0) {
-                salvarProgresso(maxTimeWatched, percentWatched, false);
-            }
-        }
-
-        function updateProgressBar(percent) {
-            const progressBar = document.getElementById('progress-bar');
-            if (progressBar) {
-                progressBar.style.width = percent + '%';
-                progressBar.innerText = percent + '%';
-            }
-
-            if (percent >= 90) {
-                const statusDiv = document.getElementById('status-concluido');
-                if (statusDiv) statusDiv.classList.remove('hidden');
-                atualizarVisualSidebar();
-            }
-        }
-
-        function atualizarVisualSidebar() {
-            const iconeContainer = document.getElementById(`icone-aula-${aulaId}`);
-            if (iconeContainer) {
-                iconeContainer.innerHTML = `
-                    <div class="w-5 h-5 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                `;
-            }
-        }
-
-        function salvarProgresso(segundos, porcentagem, redirecionar = false) {
-            axios.post('/api/progresso/atualizar', {
-                aula_id: aulaId,
-                segundo_atual: Math.floor(segundos),
-                porcentagem: porcentagem
-            })
-            .then(response => {
-                if (response.data.concluido) {
-                    const statusDiv = document.getElementById('status-concluido');
-                    if (statusDiv) statusDiv.classList.remove('hidden');
-                    atualizarVisualSidebar();
-                }
-
-                if (redirecionar) {
-                    if (proximaAulaUrl) {
-                        window.location.href = proximaAulaUrl;
-                    } else {
-                        alert('Parabéns! Você concluiu todas as aulas deste curso.');
-                    }
-                }
-            })
-            .catch(error => console.error('Erro ao salvar progresso:', error));
-        }
+    });
     </script>
-    
-    <!-- API do YouTube carregada após a declaração do script JS -->
-    <script src="https://www.youtube.com/iframe_api"></script>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginale4ebc9ed57c5009c9a50770282541134)): ?>

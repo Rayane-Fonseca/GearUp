@@ -9,7 +9,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['titulo-pagina' => ''.e($curso->titulo).'','subtitulo-pagina' => 'Detalhes e Módulos do Treinamento']); ?>
     <div class="p-8 max-w-7xl mx-auto space-y-6">
-        
+
         <!-- Navegação de Volta -->
         <div class="flex items-center justify-between">
             <a href="<?php echo e(route('aluno.cursos')); ?>" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 flex items-center gap-2">
@@ -19,16 +19,16 @@
 
         <!-- Card de Resumo do Curso -->
         <?php
-            $corBarraTopo = match($curso->categoria ?? '') {
-                'DevOps' => '#9B5DE5',
-                'Cloud Computing', 'Cloud' => '#CA7FB0',
-                'Banco de Dados' => '#FEE440',
-                'Infraestrutura' => '#00BBF9',
-                'Desenvolvimento de Software' => '#F15BB5',
-                'Segurança da Informação' => '#00F5D4',
-                'Suporte Técnico' => '#957fef',
-                default => '#3B82F6',
-            };
+        $corBarraTopo = match($curso->categoria ?? '') {
+        'DevOps' => '#9B5DE5',
+        'Cloud Computing', 'Cloud' => '#CA7FB0',
+        'Banco de Dados' => '#FEE440',
+        'Infraestrutura' => '#00BBF9',
+        'Desenvolvimento de Software' => '#F15BB5',
+        'Segurança da Informação' => '#00F5D4',
+        'Suporte Técnico' => '#957fef',
+        default => '#3B82F6',
+        };
         ?>
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 relative overflow-hidden">
@@ -51,9 +51,9 @@
 
                     <h1 class="text-2xl font-bold text-gray-900 leading-tight"><?php echo e($curso->titulo); ?></h1>
                     <p class="text-xs text-gray-500 leading-relaxed"><?php echo e($curso->descricao ?? 'Sem descrição cadastrada para este treinamento.'); ?></p>
-                    
+
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($curso->instrutor): ?>
-                        <p class="text-xs text-gray-400 font-medium">Instrutor: <span class="text-gray-600"><?php echo e($curso->instrutor); ?></span></p>
+                    <p class="text-xs text-gray-400 font-medium">Instrutor: <span class="text-gray-600"><?php echo e($curso->instrutor); ?></span></p>
                     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
 
@@ -70,71 +70,87 @@
             <h2 class="text-lg font-bold text-gray-900">Módulos de Aprendizado</h2>
 
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_1 = true; $__currentLoopData = $curso->modulos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $modulo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    
-                    <!-- Cabeçalho do Módulo -->
-                    <div class="p-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <span class="px-2.5 py-1 text-[10px] font-bold text-blue-600 bg-blue-50 rounded-full uppercase">
-                                Módulo <?php echo e($index + 1); ?>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
-                            </span>
-                            <h3 class="font-bold text-gray-800 text-sm"><?php echo e($modulo->titulo); ?></h3>
-                        </div>
-                        <span class="text-xs text-gray-400 font-medium">
-                            <?php echo e($modulo->aulas->count()); ?> <?php echo e(Str::plural('aula', $modulo->aulas->count())); ?>
+                <!-- Cabeçalho do Módulo -->
+                <div class="p-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 text-[10px] font-bold text-blue-600 bg-blue-50 rounded-full uppercase">
+                            Módulo <?php echo e($index + 1); ?>
 
                         </span>
+                        <h3 class="font-bold text-gray-800 text-sm"><?php echo e($modulo->titulo); ?></h3>
                     </div>
+                    <span class="text-xs text-gray-400 font-medium">
+                        <?php echo e($modulo->aulas->count()); ?> <?php echo e(Str::plural('aula', $modulo->aulas->count())); ?>
 
-                    <!-- Lista de Aulas -->
-                    <div class="divide-y divide-gray-100">
-                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_2 = true; $__currentLoopData = $modulo->aulas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $aula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
-                            <?php
-                                $concluida = $aula->progressos->first()?->concluido ?? false;
-                            ?>
-                            <div class="p-4 flex items-center justify-between hover:bg-gray-50/60 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($concluida): ?>
-                                        <div class="w-7 h-7 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
-                                    <?php else: ?>
-                                        <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
-                                            <svg class="w-3 h-3 fill-current ml-0.5" viewBox="0 0 24 24">
-                                                <path d="M8 5v14l11-7z" />
-                                            </svg>
-                                        </div>
-                                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </span>
+                </div>
 
-                                    <div>
-                                        <h4 class="text-xs font-semibold text-gray-800"><?php echo e($aula->titulo); ?></h4>
-                                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($concluida): ?>
-                                            <span class="text-[10px] font-medium text-emerald-600">Concluída</span>
-                                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                                    </div>
-                                </div>
+                <!-- Lista de Aulas -->
+                <div class="divide-y divide-gray-100">
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__empty_2 = true; $__currentLoopData = $modulo->aulas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $aula): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_2 = false; ?>
+                    <?php
+                    // 1. Identifica o ID correto da aula
+                    $aulaId = $aula->id_aula ?? $aula->id;
 
-                                <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aula->id_aula ?? $aula->id])); ?>"
-                                   class="py-2 px-4 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-colors">
-                                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                    Assistir
-                                </a>
+                    // 2. Localiza o progresso desta aula específica na coleção enviada pelo Controller
+                    $progressoAula = $aula->progressos->firstWhere('aula_id', $aulaId) ?? $aula->progressos->first();
+
+                    // 3. Valida se está marcada como concluída ou se atingiu 90%
+                    $concluida = $progressoAula && ($progressoAula->concluido || $progressoAula->porcentagem >= 90);
+                    ?>
+
+                    <div class="p-4 flex items-center justify-between transition-colors <?php echo e($concluida ? 'bg-emerald-50/30 hover:bg-emerald-50/60' : 'hover:bg-gray-50/60'); ?>">
+                        <div class="flex items-center gap-3">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($concluida): ?>
+                            <div class="w-7 h-7 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
                             </div>
-                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
-                            <p class="p-4 text-xs text-gray-400 italic">Nenhuma aula disponível neste módulo.</p>
-                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                    </div>
+                            <?php else: ?>
+                            <div class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0">
+                                <svg class="w-3 h-3 fill-current ml-0.5" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z" />
+                                </svg>
+                            </div>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
+                            <div>
+                                <h4 class="text-xs font-semibold text-gray-800"><?php echo e($aula->titulo); ?></h4>
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($concluida): ?>
+                                <span class="text-[10px] font-medium text-emerald-600">Concluída</span>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Botão de Ação -->
+                        <a href="<?php echo e(route('aluno.aulas.show', [$curso->id_curso ?? $curso->id, $aulaId])); ?>"
+                            class="py-2 px-4 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors <?php echo e($concluida ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-700' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'); ?>">
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($concluida): ?>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Concluído
+                            <?php else: ?>
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            Assistir
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </a>
+                    </div>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_2): ?>
+                    <p class="p-4 text-xs text-gray-400 italic">Nenhuma aula disponível neste módulo.</p>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </div>
+
+            </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center text-gray-400 text-xs">
-                    Nenhum módulo cadastrado para este curso ainda.
-                </div>
+            <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center text-gray-400 text-xs">
+                Nenhum módulo cadastrado para este curso ainda.
+            </div>
             <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </div>
 

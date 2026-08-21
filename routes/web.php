@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
         // Gestão de Colaboradores
         Route::get('/colaboradores', [AdminController::class, 'colaboradores'])->name('colaboradores');
         Route::post('/colaboradores', [AdminController::class, 'colaboradoresStore'])->name('colaboradores.store');
+        Route::delete('/colaboradores/{colaborador}', [AdminController::class, 'colaboradoresDestroy'])->name('colaboradores.destroy');
     });
 
     // --- Atualização de Progresso do Aluno ---

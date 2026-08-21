@@ -298,6 +298,27 @@ class AdminController extends Controller
 
         return redirect()->route('admin.colaboradores')->with('status', 'Colaborador cadastrado com sucesso.');
     }
+
+    public function colaboradoresDestroy(Usuario $colaborador)
+    {
+        if ($colaborador->perfil !== 'colaborador') {
+            return redirect()->route('admin.colaboradores')->with('erro', 'Esta tela só permite excluir colaboradores.');
+        }
+
+        if ($colaborador->id_usuario === auth()->id()) {
+            return redirect()->route('admin.colaboradores')->with('erro', 'Você não pode excluir a si mesmo.');
+        }
+
+        // Foto do colaborador (se houver) é removida do storage junto com o registro
+        if ($colaborador->foto) {
+            Storage::disk('public')->delete($colaborador->foto);
+        }
+
+        $nome = $colaborador->nome;
+        $colaborador->delete();
+
+        return redirect()->route('admin.colaboradores')->with('status', "Colaborador \"{$nome}\" excluído com sucesso.");
+    }
     public function index()
     {
         $usuario = auth()->user();

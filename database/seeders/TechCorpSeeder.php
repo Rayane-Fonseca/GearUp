@@ -142,11 +142,13 @@ class TechCorpSeeder extends Seeder
         // 5. PROGRESSO DO LUCAS ANDRADE (usuário de demonstração)
         // ==========================================================
         $progressoLucas = [
+            'Docker e Kubernetes na Prática' => 72,
             'AWS Solutions Architect' => 45,
             'Python para Engenharia de Dados' => 100,
+            'React e TypeScript Avançado' => 28,
+            'Suporte Nível 2 — Windows Server' => 55,
+            'Fundamentos de Redes TCP/IP' => 100,
             'Git e GitHub para Times' => 100,
-            'Infraestrutura como Código' => 10,
-            'Segurança Ofensiva — Pentest' => 56,
         ];
 
         foreach ($progressoLucas as $tituloCurso => $porcentagem) {
@@ -201,6 +203,12 @@ class TechCorpSeeder extends Seeder
             'id_curso' => $cursos['Python para Engenharia de Dados']->id_curso,
             'codigo_autenticacao' => strtoupper('GEAR-' . Str::random(10)),
             'emitido_em' => Carbon::parse('2025-06-12'),
+        ]);
+        Certificado::create([
+            'id_usuario' => $lucas->id_usuario,
+            'id_curso' => $cursos['Fundamentos de Redes TCP/IP']->id_curso,
+            'codigo_autenticacao' => strtoupper('GEAR-' . Str::random(10)),
+            'emitido_em' => Carbon::parse('2025-03-03'),
         ]);
         Certificado::create([
             'id_usuario' => $lucas->id_usuario,

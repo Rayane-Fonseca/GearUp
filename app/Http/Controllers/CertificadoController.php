@@ -2,12 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GerarPdfCertificadoJob;
 use App\Models\Certificado;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 
 class CertificadoController extends Controller
 {
+    /**
+     * Solicitação manual de certificado (fallback). Na prática o certificado já é
+     * liberado automaticamente assim que o aluno conclui 100% do curso.
+     */
+    public function solicitar($idCurso)
+    {
+        try {
+            Certificado::validarEmissao(auth()->id(), (int) $idCurso);
+        } catch (\Exception $e) {
+            return back()->with('erro', $e->getMessage());
+        }
+
+        GerarPdfCertificadoJob::dispatchSync(auth()->id(), (int) $idCurso);
+
+        return back()->with('status', 'Certificado emitido com sucesso!');
+    }
+
     public function preview($id)
     {
         // Carregamos apenas 'usuario' e 'curso' (pois 'instrutor' já é uma coluna de 'curso')

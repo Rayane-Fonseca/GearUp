@@ -86,6 +86,30 @@ if ($hora >= 5 && $hora < 12) {
 
             </div>
 
+            {{-- ALERTA DE CURSOS OBRIGATÓRIOS PENDENTES (de acordo com a área do aluno) --}}
+            @if($cursosObrigatoriosPendentes->isNotEmpty())
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-red-600 text-white rounded-xl shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-red-700 text-sm">
+                            {{ $cursosObrigatoriosPendentes->count() }} curso{{ $cursosObrigatoriosPendentes->count() > 1 ? 's' : '' }} obrigatório{{ $cursosObrigatoriosPendentes->count() > 1 ? 's' : '' }} para sua área ({{ $usuario->area }}) ainda {{ $cursosObrigatoriosPendentes->count() > 1 ? 'não foram concluídos' : 'não foi concluído' }}
+                        </h4>
+                        <p class="text-xs text-red-600/80 mt-1">
+                            {{ $cursosObrigatoriosPendentes->pluck('titulo')->take(3)->implode(' • ') }}{{ $cursosObrigatoriosPendentes->count() > 3 ? ' • ...' : '' }}
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('aluno.cursos') }}" class="shrink-0 py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs rounded-xl transition-colors text-center">
+                    Ver cursos obrigatórios
+                </a>
+            </div>
+            @endif
+
             {{-- CURSOS EM ANDAMENTO (LIMITADO A 3) --}}
             <div class="space-y-3">
                 <div class="flex justify-between items-center">

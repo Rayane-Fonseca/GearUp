@@ -9,6 +9,7 @@ $rotaAtual = request()->route()->getName();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
     <title>GearUp - Área do Colaborador</title>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
@@ -80,6 +81,8 @@ $rotaAtual = request()->route()->getName();
 
         </main>
     </div>
+
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 
 </html><?php /**PATH C:\Users\otvoa\Downloads\GearUp-postgresql\resources\views/components/aluno-layout.blade.php ENDPATH**/ ?>

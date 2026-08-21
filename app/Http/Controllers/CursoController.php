@@ -25,6 +25,8 @@ class CursoController extends Controller
             $query->where('usuario_id', auth()->id());
         }]);
 
-        return view('aluno.cursos.show', compact('curso'));
+        $obrigatorio = $curso->ehObrigatorioPara(auth()->user());
+
+        return view('aluno.cursos.show', compact('curso', 'obrigatorio'));
     }
 }

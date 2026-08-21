@@ -50,24 +50,40 @@
             };
             @endphp
 
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative {{ $curso->obrigatorio ? 'ring-2 ring-red-200' : '' }}">
+                <!-- Barra colorida no topo -->
                 <div class="absolute top-0 left-0 right-0 h-1" style="background-color: {{ $corBarraTopo }};"></div>
 
                 <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="px-3 py-1 text-[11px] font-medium text-gray-600 rounded-full">
-                            {{ $curso->categoria }}
+                    <!-- Cabeçalho: Categoria, Status e Badge de Obrigatório no mesmo alinhamento -->
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="px-3 py-1 text-[11px] font-medium text-gray-600 bg-gray-100 rounded-full">
+                                {{ $curso->categoria }}
+                            </span>
+
+                            <span class="px-3 py-1 text-[11px] font-medium rounded-full {{ $corBadge }}">
+                                {{ $status }}
+                            </span>
+                        </div>
+
+                        @if($curso->obrigatorio)
+                        <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide bg-red-600 text-white rounded-full flex items-center gap-1 shadow-sm shrink-0">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                            </svg>
+                            Obrigatório
                         </span>
-                        <span class="px-3 py-1 text-[11px] font-medium rounded-full {{ $corBadge }}">
-                            {{ $status }}
-                        </span>
+                        @endif
                     </div>
 
-                    <a href="{{ route('aluno.cursos.show', $curso->id_curso) }}" class="group inline-block">
+                    <!-- Título e Detalhes do Curso -->
+                    <a href="{{ route('aluno.cursos.show', $curso->id_curso) }}" class="group block">
                         <h3 class="font-bold text-gray-900 text-sm mb-1 line-clamp-1 group-hover:text-blue-600 transition-colors">
                             {{ $curso->titulo }}
                         </h3>
                     </a>
+
                     <p class="text-xs text-gray-400 mb-1">{{ $curso->instrutor }}</p>
                     <p class="text-xs text-gray-400 flex items-center gap-1 font-medium">
                         <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +93,7 @@
                     </p>
                 </div>
 
+                <!-- Progresso e Botões -->
                 <div class="mt-5">
                     <div class="flex items-center gap-3 mb-4">
                         <div class="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">

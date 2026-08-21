@@ -31,13 +31,13 @@ class Aula extends Model
 
     public function progressos(): HasMany
     {
-        return $this->hasMany(Progresso::class, 'aula_id', 'id');
+        return $this->hasMany(AulaProgresso::class, 'aula_id', 'id');
     }
 
     /**
      * Método Auxiliar: Retorna o progresso do usuário logado
      */
-    public function progressoUsuario(): ?Progresso
+    public function progressoUsuario(): ?AulaProgresso
     {
         // Se a relação 'progressos' já estiver carregada na memória, busca na Coleção
         if ($this->relationLoaded('progressos')) {

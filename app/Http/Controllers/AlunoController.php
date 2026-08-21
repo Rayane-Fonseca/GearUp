@@ -38,6 +38,15 @@ class AlunoController extends Controller
             ->take(3)
             ->get();
 
+        // Cursos obrigatórios para a área de atuação do aluno que ainda não foram concluídos
+        $progressoPorCurso = $progressos->keyBy('curso_id');
+        $cursosObrigatoriosPendentes = $usuario->area
+            ? Curso::where('categoria', $usuario->area)
+                ->get()
+                ->filter(fn ($curso) => ($progressoPorCurso[$curso->id_curso]->porcentagem ?? 0) < 100)
+                ->values()
+            : collect();
+
         return view('aluno.inicio', compact(
             'usuario',
             'emAndamento',
@@ -46,7 +55,8 @@ class AlunoController extends Controller
             'horasTotais',
             'certificadosCount',
             'recomendado',
-            'notificacoes'
+            'notificacoes',
+            'cursosObrigatoriosPendentes'
         ));
     }
 
@@ -63,6 +73,20 @@ class AlunoController extends Controller
 
         $progressosPorCurso = Progresso::where('usuario_id', $usuario->id_usuario)
             ->pluck('porcentagem', 'curso_id');
+
+        // Marca quais cursos são obrigatórios para a área de atuação do aluno logado
+        // e traz eles pendentes (não concluídos) para o topo da listagem.
+        $cursos = $cursos
+            ->map(function ($curso) use ($usuario, $progressosPorCurso) {
+                $curso->obrigatorio = $curso->ehObrigatorioPara($usuario);
+                $curso->percentual = $progressosPorCurso[$curso->id_curso] ?? 0;
+                return $curso;
+            })
+            ->sortBy([
+                fn ($curso) => $curso->obrigatorio && $curso->percentual < 100 ? 0 : 1,
+                fn ($curso) => $curso->titulo,
+            ])
+            ->values();
 
         $categorias = Curso::select('categoria')->distinct()->orderBy('categoria')->pluck('categoria');
 
