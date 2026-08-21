@@ -85,7 +85,7 @@ Se você rodar o seeder (`TechCorpSeeder`), as seguintes contas ficam disponíve
 | Administrador | `admin@techcorp.com.br` | Acessa `/admin` (painel personalizado) |
 | Colaboradores extras | `ana@`, `rafael@`, `fernanda@`, `carlos@`, `marcos@`, `juliana@`, `paulo@techcorp.com.br` | Aparecem em Gerenciar Colaboradores, cada um com uma área de atuação diferente |
 
-A tela de login tem dois botões — **"Entrar como Colaborador"** e **"Entrar como Administrador"** — e valida se a conta realmente tem aquele perfil antes de deixar entrar.
+A tela de login tem um botão — **"Entrar"** — e valida se a conta é admin ou colaborador antes de deixar entrar.
 
 ---
 
@@ -100,7 +100,7 @@ Painel com saudação personalizada, progresso geral do aluno, cursos em andamen
 Catálogo de todos os cursos, com filtro por categoria. Cada card mostra:
 - Categoria e status (Não iniciado / Em andamento / Concluído);
 - Barra de progresso real do aluno naquele curso;
-- Selo **"Obrigatório"** quando o curso é obrigatório para a área do aluno — esses cursos aparecem destacados (borda vermelha) e são ordenados no topo da lista enquanto não forem concluídos.
+- Selo **"Obrigatório"** quando o curso é obrigatório para a área do aluno — esses cursos aparecem destacados e são ordenados no topo da lista enquanto não forem concluídos.
 
 ### Detalhe do curso (`/aluno/cursos/{curso}`)
 Lista os módulos e aulas do curso, com indicação de quais aulas o aluno já concluiu, e também exibe o selo de curso obrigatório quando aplicável.
