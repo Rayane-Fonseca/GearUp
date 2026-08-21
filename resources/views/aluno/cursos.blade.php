@@ -50,7 +50,7 @@
             };
             @endphp
 
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative {{ $curso->obrigatorio ? 'ring-2 ring-red-200' : '' }}">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative {{ $curso->obrigatorio ? : '' }}">
                 <!-- Barra colorida no topo -->
                 <div class="absolute top-0 left-0 right-0 h-1" style="background-color: {{ $corBarraTopo }};"></div>
 
