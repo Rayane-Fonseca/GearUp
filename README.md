@@ -4,7 +4,7 @@ Sistema de treinamento corporativo (LMS — *Learning Management System*) constr
 
 A plataforma tem duas áreas separadas por perfil de usuário:
 
-- **Colaborador (aluno)**: assiste aos cursos da empresa, acompanha seu progresso, conclui trilhas de aprendizagem e recebe certificados.
+- **Colaborador**: assiste aos cursos da empresa, acompanha seu progresso, conclui trilhas de aprendizagem e recebe certificados.
 - **Administrador**: cadastra cursos, módulos e aulas, gerencia colaboradores e acompanha as métricas gerais de treinamento da empresa.
 
 ---
@@ -125,21 +125,13 @@ Lista os certificados já emitidos (com opção de pré-visualizar e baixar o PD
 
 ## Funcionalidades — Área do Administrador
 
-Existem **dois painéis administrativos**, ambos restritos ao perfil `administrador`:
+Existe **um painel administrativo**, restrito ao perfil `administrador`:
 
 ### Painel personalizado (`/admin`)
 Feito sob medida com o mesmo visual da plataforma (sidebar escura), pensado para o dia a dia:
 - **Dashboard**: cards de resumo, gráfico de atividade mensal (barras) e distribuição de cursos por categoria (rosca), via Chart.js.
 - **Gerenciar Cursos**: CRUD completo de cursos, módulos e aulas (criar, editar, excluir), tudo em modais.
 - **Gerenciar Colaboradores**: busca e filtro por área de atuação, cadastro de novos colaboradores.
-
-### Painel Filament (`/gestao`)
-Painel administrativo mais avançado, para gestão detalhada de:
-- Cursos, Módulos e Aulas (Resources completos com formulários e tabelas);
-- Colaboradores;
-- Certificados emitidos;
-- Notificações;
-- Widgets de estatísticas gerais e gráficos.
 
 ---
 
