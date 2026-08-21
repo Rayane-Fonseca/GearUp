@@ -20,7 +20,7 @@ if ($hora >= 5 && $hora < 12) {
                 <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between relative overflow-hidden">
                     <div>
                         <span class="text-[11px] font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
-                            {{ $saudacao }} 👋
+                            {{ $saudacao }} 
                         </span>
                         <h2 class="text-xl font-bold mt-2 truncate">{{ $usuario->nome }}</h2>
                         <p class="text-xs text-blue-200 mt-0.5 truncate">{{ $usuario->cargo }}{{ $usuario->area ? ' • ' . $usuario->area : '' }}</p>
