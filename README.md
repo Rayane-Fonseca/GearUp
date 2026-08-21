@@ -82,7 +82,7 @@ Se você rodar o seeder (`TechCorpSeeder`), as seguintes contas ficam disponíve
 | Perfil | E-mail | Observação |
 |---|---|---|
 | Colaborador (demo) | `lucas@techcorp.com.br` | Usuário principal de demonstração, com progresso, trilhas e certificados |
-| Administrador | `admin@techcorp.com.br` | Acessa `/admin` (painel personalizado) e `/gestao` (Filament) |
+| Administrador | `admin@techcorp.com.br` | Acessa `/admin` (painel personalizado) |
 | Colaboradores extras | `ana@`, `rafael@`, `fernanda@`, `carlos@`, `marcos@`, `juliana@`, `paulo@techcorp.com.br` | Aparecem em Gerenciar Colaboradores, cada um com uma área de atuação diferente |
 
 A tela de login tem dois botões — **"Entrar como Colaborador"** e **"Entrar como Administrador"** — e valida se a conta realmente tem aquele perfil antes de deixar entrar.
