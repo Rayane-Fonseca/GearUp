@@ -29,7 +29,7 @@ if ($hora >= 5 && $hora < 12) {
                 <div class="bg-gradient-to-br from-blue-700 to-indigo-800 rounded-2xl p-5 text-white shadow-sm flex flex-col justify-between relative overflow-hidden">
                     <div>
                         <span class="text-[11px] font-semibold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
-                            <?php echo e($saudacao); ?> 👋
+                            <?php echo e($saudacao); ?> 
                         </span>
                         <h2 class="text-xl font-bold mt-2 truncate"><?php echo e($usuario->nome); ?></h2>
                         <p class="text-xs text-blue-200 mt-0.5 truncate"><?php echo e($usuario->cargo); ?><?php echo e($usuario->area ? ' • ' . $usuario->area : ''); ?></p>
@@ -250,4 +250,5 @@ if ($hora >= 5 && $hora < 12) {
 <?php if (isset($__componentOriginale4ebc9ed57c5009c9a50770282541134)): ?>
 <?php $component = $__componentOriginale4ebc9ed57c5009c9a50770282541134; ?>
 <?php unset($__componentOriginale4ebc9ed57c5009c9a50770282541134); ?>
-<?php endif; ?><?php /**PATH C:\Users\otvoa\Downloads\GearUp\resources\views/aluno/inicio.blade.php ENDPATH**/ ?>
+<?php endif; ?>
+<?php /**PATH C:\Users\otvoa\Downloads\GearUp\resources\views/aluno/inicio.blade.php ENDPATH**/ ?>

@@ -15,18 +15,52 @@
         </div>
 
         <!-- Filtro de Categorias em Pills -->
-        <div class="flex gap-2 overflow-x-auto pb-1">
-            <a href="<?php echo e(route('aluno.cursos')); ?>"
-                class="px-4 py-1.5 text-xs rounded-full transition-colors <?php echo e(!$categoria || $categoria === 'Todos' ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium'); ?>">
-                Todos
-            </a>
-            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <a href="<?php echo e(route('aluno.cursos', ['categoria' => $cat])); ?>"
-                class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors <?php echo e($categoria === $cat ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium'); ?>">
-                <?php echo e($cat); ?>
+        <div class="relative" x-data="{
+                podeVoltar: false,
+                podeAvancar: false,
+                avancarFiltros() { this.$refs.filtrosScroll.scrollBy({ left: 160, behavior: 'smooth' }); },
+                voltarFiltros() { this.$refs.filtrosScroll.scrollBy({ left: -160, behavior: 'smooth' }); },
+                atualizarSetas() {
+                    const el = this.$refs.filtrosScroll;
+                    if (!el) return;
+                    this.podeVoltar = el.scrollLeft > 4;
+                    this.podeAvancar = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+                }
+            }"
+            x-init="$nextTick(() => atualizarSetas())">
+            <div x-ref="filtrosScroll" @scroll="atualizarSetas()" class="sem-scrollbar flex gap-2 overflow-x-auto px-9 lg:px-0 scroll-smooth">
+                <a href="<?php echo e(route('aluno.cursos')); ?>"
+                    class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors <?php echo e(!$categoria || $categoria === 'Todos' ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium'); ?>">
+                    Todos
+                </a>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $categorias; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <a href="<?php echo e(route('aluno.cursos', ['categoria' => $cat])); ?>"
+                    class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors <?php echo e($categoria === $cat ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium'); ?>">
+                    <?php echo e($cat); ?>
 
-            </a>
-            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                </a>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
+
+            <!-- Botão Anterior -->
+            <button x-show="podeVoltar" x-cloak @click="voltarFiltros()" type="button" aria-label="Categorias anteriores"
+                    class="lg:hidden absolute left-0 top-0 bottom-0 w-9 flex items-center justify-start bg-gradient-to-r from-slate-50 via-slate-50/90 to-transparent">
+                <span class="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm text-gray-500">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </span>
+            </button>
+
+            <!-- Botão Avançar -->
+            <button x-show="podeAvancar" x-cloak @click="avancarFiltros()" type="button" aria-label="Mais categorias"
+                    class="lg:hidden absolute right-0 top-0 bottom-0 w-9 flex items-center justify-end bg-gradient-to-l from-slate-50 via-slate-50/90 to-transparent">
+                <span class="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm text-gray-500">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </button>
         </div>
 
         <!-- Grid de Cursos -->
@@ -60,7 +94,7 @@
             };
             ?>
 
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative <?php echo e($curso->obrigatorio ? 'ring-2 ring-red-200' : ''); ?>">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between p-5 relative <?php echo e($curso->obrigatorio ? : ''); ?>">
                 <!-- Barra colorida no topo -->
                 <div class="absolute top-0 left-0 right-0 h-1" style="background-color: <?php echo e($corBarraTopo); ?>;"></div>
 

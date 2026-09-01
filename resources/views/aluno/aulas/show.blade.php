@@ -25,24 +25,27 @@
          x-init="iniciar()"
          @beforeunload.window="salvarProgresso(true)"
          class="h-[calc(100vh-4rem)] flex flex-col bg-slate-50 text-gray-800 overflow-hidden">
-        <div x-data="{ sidebarOpen: true, moduloAberto: {{ $aula->modulo_id ?? $aula->id_modulo ?? 'null' }} }" class="h-full flex flex-col overflow-hidden">
+        <div x-data="{ sidebarOpen: false, moduloAberto: {{ $aula->modulo_id ?? $aula->id_modulo ?? 'null' }} }" class="h-full flex flex-col overflow-hidden">
 
         <!-- Header Superior do Player -->
-        <header class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between shadow-xs shrink-0 z-10">
-            <div class="flex items-center gap-4">
-                <a href="{{ route('aluno.cursos.show', $curso->id_curso ?? $curso->id) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
-                    Voltar ao Curso
+        <header class="bg-white border-b border-gray-100 px-3 sm:px-6 py-3 flex items-center justify-between gap-2 shadow-xs shrink-0 z-10">
+            <div class="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                <a href="{{ route('aluno.cursos.show', $curso->id_curso ?? $curso->id) }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors shrink-0">
+                    <svg class="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    <span class="hidden sm:inline">Voltar ao Curso</span>
                 </a>
-                <span class="text-gray-200">|</span>
-                <h1 class="text-sm font-bold text-gray-900 truncate max-w-xl">{{ $curso->titulo }}</h1>
+                <span class="text-gray-200 hidden sm:inline shrink-0">|</span>
+                <h1 class="text-sm font-bold text-gray-900 truncate min-w-0">{{ $curso->titulo }}</h1>
             </div>
 
             <!-- Botão de Ocultar/Exibir Sidebar -->
-            <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-3 py-2 rounded-xl transition-colors">
+            <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-2.5 sm:px-3 py-2 rounded-xl transition-colors shrink-0">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
-                <span x-text="sidebarOpen ? 'Ocultar Conteúdo' : 'Ver Conteúdo'"></span>
+                <span class="hidden sm:inline" x-text="sidebarOpen ? 'Ocultar Conteúdo' : 'Ver Conteúdo'"></span>
             </button>
         </header>
 
@@ -288,6 +291,7 @@
                 ytPlayer: null,
                 ytIntervalo: null,
                 ultimoSalvamento: 0,
+                maiorTempoAssistido: config.tempoInicial || 0,
 
                 iniciar() {
                     if (this.ehYoutube && this.youtubeId) {
@@ -373,11 +377,27 @@
                     this.pararPollingYoutube();
                     this.ytIntervalo = setInterval(() => {
                         if (!this.ytPlayer || typeof this.ytPlayer.getCurrentTime !== 'function') return;
-                        this.tempoAtual = Math.floor(this.ytPlayer.getCurrentTime());
                         this.duracaoTotal = Math.floor(this.ytPlayer.getDuration()) || this.duracaoTotal;
+
+                        // Bloqueador de avanço: impede pular a aula arrastando a barra do vídeo
+                        const tempoBruto = Math.floor(this.ytPlayer.getCurrentTime());
+                        const tolerancia = 2; // margem de segundos para variações naturais de buffer
+                        if (tempoBruto > this.maiorTempoAssistido + tolerancia) {
+                            this.ytPlayer.seekTo(this.maiorTempoAssistido, true);
+                            this.tempoAtual = this.maiorTempoAssistido;
+                        } else {
+                            this.tempoAtual = tempoBruto;
+                            if (this.tempoAtual > this.maiorTempoAssistido) {
+                                this.maiorTempoAssistido = this.tempoAtual;
+                            }
+                        }
+
                         this.atualizarPorcentagemLocal();
-                        this.salvarProgresso();
-                    }, 5000);
+
+                        if (this.tempoAtual - this.ultimoSalvamento >= 5) {
+                            this.salvarProgresso();
+                        }
+                    }, 1000);
                 },
 
                 pararPollingYoutube() {

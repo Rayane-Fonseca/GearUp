@@ -6,17 +6,51 @@
         </div>
 
         <!-- Filtro de Categorias em Pills -->
-        <div class="flex gap-2 overflow-x-auto pb-1">
-            <a href="{{ route('aluno.cursos') }}"
-                class="px-4 py-1.5 text-xs rounded-full transition-colors {{ !$categoria || $categoria === 'Todos' ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium' }}">
-                Todos
-            </a>
-            @foreach($categorias as $cat)
-            <a href="{{ route('aluno.cursos', ['categoria' => $cat]) }}"
-                class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors {{ $categoria === $cat ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium' }}">
-                {{ $cat }}
-            </a>
-            @endforeach
+        <div class="relative" x-data="{
+                podeVoltar: false,
+                podeAvancar: false,
+                avancarFiltros() { this.$refs.filtrosScroll.scrollBy({ left: 160, behavior: 'smooth' }); },
+                voltarFiltros() { this.$refs.filtrosScroll.scrollBy({ left: -160, behavior: 'smooth' }); },
+                atualizarSetas() {
+                    const el = this.$refs.filtrosScroll;
+                    if (!el) return;
+                    this.podeVoltar = el.scrollLeft > 4;
+                    this.podeAvancar = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+                }
+            }"
+            x-init="$nextTick(() => atualizarSetas())">
+            <div x-ref="filtrosScroll" @scroll="atualizarSetas()" class="sem-scrollbar flex gap-2 overflow-x-auto px-9 lg:px-0 scroll-smooth">
+                <a href="{{ route('aluno.cursos') }}"
+                    class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors {{ !$categoria || $categoria === 'Todos' ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium' }}">
+                    Todos
+                </a>
+                @foreach($categorias as $cat)
+                <a href="{{ route('aluno.cursos', ['categoria' => $cat]) }}"
+                    class="px-4 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors {{ $categoria === $cat ? 'bg-blue-600 text-white font-semibold' : 'bg-white text-gray-600 hover:bg-gray-100 font-medium' }}">
+                    {{ $cat }}
+                </a>
+                @endforeach
+            </div>
+
+            <!-- Botão Anterior -->
+            <button x-show="podeVoltar" x-cloak @click="voltarFiltros()" type="button" aria-label="Categorias anteriores"
+                    class="lg:hidden absolute left-0 top-0 bottom-0 w-9 flex items-center justify-start bg-gradient-to-r from-slate-50 via-slate-50/90 to-transparent">
+                <span class="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm text-gray-500">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </span>
+            </button>
+
+            <!-- Botão Avançar -->
+            <button x-show="podeAvancar" x-cloak @click="avancarFiltros()" type="button" aria-label="Mais categorias"
+                    class="lg:hidden absolute right-0 top-0 bottom-0 w-9 flex items-center justify-end bg-gradient-to-l from-slate-50 via-slate-50/90 to-transparent">
+                <span class="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm text-gray-500">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </button>
         </div>
 
         <!-- Grid de Cursos -->
