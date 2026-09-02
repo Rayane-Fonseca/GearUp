@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
         // Gestão de Colaboradores
         Route::get('/colaboradores', [AdminController::class, 'colaboradores'])->name('colaboradores');
         Route::post('/colaboradores', [AdminController::class, 'colaboradoresStore'])->name('colaboradores.store');
+        Route::get('/colaboradores/{colaborador}/progresso', [AdminController::class, 'colaboradoresProgresso'])->name('colaboradores.progresso');
         Route::delete('/colaboradores/{colaborador}', [AdminController::class, 'colaboradoresDestroy'])->name('colaboradores.destroy');
     });
 

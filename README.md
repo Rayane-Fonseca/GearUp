@@ -219,8 +219,7 @@ logs (...)
 ```
 app/
   Console/Commands/          Comandos artisan (zerar progresso, recalcular trilhas, avisos)
-  Filament/                  Resources, Pages e Widgets do painel /gestao
-  Http/Controllers/          Controllers da área pública/aluno/admin
+  Filament/                  Resources, Pages e Widgets do aluno/admin
   Http/Controllers/Api/      ProgressoController (salva progresso da aula via fetch/AJAX)
   Http/Middleware/           PerfilMiddleware (bloqueia acesso cruzado aluno/admin)
   Jobs/                      GerarPdfCertificadoJob

@@ -140,18 +140,11 @@
                             </td>
 
                             <td class="whitespace-nowrap px-6 py-3.5 text-right">
-                                <form
-                                    method="POST"
-                                    action="<?php echo e(route('admin.colaboradores.destroy', $colaborador->id_usuario)); ?>"
-                                    class="inline-block"
-                                    onsubmit="return confirm('Tem certeza que deseja excluir <?php echo e(addslashes($colaborador->nome)); ?>? Essa ação não pode ser desfeita.');">
-                                    <?php echo csrf_field(); ?>
-                                    <?php echo method_field('DELETE'); ?>
-
-                                    <button
-                                        type="submit"
-                                        title="Excluir colaborador"
-                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                                <div class="inline-flex items-center gap-2">
+                                    <a
+                                        href="<?php echo e(route('admin.colaboradores.progresso', $colaborador->id_usuario)); ?>"
+                                        title="Ver progresso"
+                                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100">
                                         <svg
                                             class="h-4 w-4"
                                             fill="none"
@@ -161,10 +154,41 @@
                                                 stroke-linecap="round"
                                                 stroke-linejoin="round"
                                                 stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                    </button>
-                                </form>
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="<?php echo e(route('admin.colaboradores.destroy', $colaborador->id_usuario)); ?>"
+                                        class="inline-block"
+                                        onsubmit="return confirm('Tem certeza que deseja excluir <?php echo e(addslashes($colaborador->nome)); ?>? Essa ação não pode ser desfeita.');">
+                                        <?php echo csrf_field(); ?>
+                                        <?php echo method_field('DELETE'); ?>
+
+                                        <button
+                                            type="submit"
+                                            title="Excluir colaborador"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                                            <svg
+                                                class="h-4 w-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
@@ -202,18 +226,11 @@
                             </div>
                         </div>
 
-                        <form
-                            method="POST"
-                            action="<?php echo e(route('admin.colaboradores.destroy', $colaborador->id_usuario)); ?>"
-                            class="shrink-0"
-                            onsubmit="return confirm('Tem certeza que deseja excluir <?php echo e(addslashes($colaborador->nome)); ?>? Essa ação não pode ser desfeita.');">
-                            <?php echo csrf_field(); ?>
-                            <?php echo method_field('DELETE'); ?>
-
-                            <button
-                                type="submit"
-                                title="Excluir colaborador"
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                        <div class="flex shrink-0 items-center gap-2">
+                            <a
+                                href="<?php echo e(route('admin.colaboradores.progresso', $colaborador->id_usuario)); ?>"
+                                title="Ver progresso"
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition hover:bg-blue-100">
                                 <svg
                                     class="h-4 w-4"
                                     fill="none"
@@ -223,10 +240,40 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 01-1 1v3M4 7h16" />
+                                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                            </button>
-                        </form>
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="<?php echo e(route('admin.colaboradores.destroy', $colaborador->id_usuario)); ?>"
+                                onsubmit="return confirm('Tem certeza que deseja excluir <?php echo e(addslashes($colaborador->nome)); ?>? Essa ação não pode ser desfeita.');">
+                                <?php echo csrf_field(); ?>
+                                <?php echo method_field('DELETE'); ?>
+
+                                <button
+                                    type="submit"
+                                    title="Excluir colaborador"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 transition hover:bg-red-100">
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 01-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px]">

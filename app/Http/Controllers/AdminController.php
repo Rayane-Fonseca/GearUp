@@ -319,6 +319,31 @@ class AdminController extends Controller
 
         return redirect()->route('admin.colaboradores')->with('status', "Colaborador \"{$nome}\" excluído com sucesso.");
     }
+
+    public function colaboradoresProgresso(Usuario $colaborador)
+    {
+        abort_if($colaborador->perfil !== 'colaborador', 404);
+
+        $colaborador->load(['progressos' => function ($query) {
+            $query->with('curso')->orderByDesc('porcentagem');
+        }, 'certificados.curso']);
+
+        $totalCursos = $colaborador->progressos->count();
+        $concluidos = $colaborador->progressos->where('porcentagem', '>=', 100)->count();
+        $emAndamento = $colaborador->progressos->whereBetween('porcentagem', [1, 99])->count();
+        $naoIniciados = $colaborador->progressos->where('porcentagem', 0)->count();
+        $progressoMedio = $totalCursos > 0 ? (int) round($colaborador->progressos->avg('porcentagem')) : 0;
+
+        return view('admin.colaborador-progresso', compact(
+            'colaborador',
+            'totalCursos',
+            'concluidos',
+            'emAndamento',
+            'naoIniciados',
+            'progressoMedio'
+        ));
+    }
+
     public function index()
     {
         $usuario = auth()->user();

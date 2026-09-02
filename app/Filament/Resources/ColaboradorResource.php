@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ColaboradorResource\Pages;
+use App\Filament\Resources\ColaboradorResource\RelationManagers\ProgressosRelationManager;
 use App\Models\Usuario;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -60,9 +61,9 @@ class ColaboradorResource extends Resource
                         Forms\Components\TextInput::make('password') // Alterado de password para senha
                             ->password()
                             ->label('Senha de Acesso')
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->required(fn (string $context): bool => $context === 'create')
-                            ->dehydrated(fn ($state) => filled($state))
+                            ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                            ->required(fn(string $context): bool => $context === 'create')
+                            ->dehydrated(fn($state) => filled($state))
                             ->helperText('Deixe em branco para manter a senha atual.'),
 
                         Forms\Components\Select::make('status')
@@ -88,57 +89,66 @@ class ColaboradorResource extends Resource
             ]);
     }
 
-public static function table(Table $table): Table
-{
-    return $table
-        ->columns([
-            Tables\Columns\ImageColumn::make('foto')
-                ->circular()
-                ->label('Foto'),
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\ImageColumn::make('foto')
+                    ->circular()
+                    ->label('Foto'),
 
-            Tables\Columns\TextColumn::make('nome')
-                ->searchable()
-                ->weight('bold')
-                ->label('Colaborador'),
+                Tables\Columns\TextColumn::make('nome')
+                    ->searchable()
+                    ->weight('bold')
+                    ->label('Colaborador'),
 
-            Tables\Columns\TextColumn::make('cargo')
-                ->label('Cargo')
-                ->searchable(),
+                Tables\Columns\TextColumn::make('cargo')
+                    ->label('Cargo')
+                    ->searchable(),
 
-            Tables\Columns\TextColumn::make('email')
-                ->label('E-mail')
-                ->searchable(),
-        ])
-        ->filters([
+                Tables\Columns\TextColumn::make('email')
+                    ->label('E-mail')
+                    ->searchable(),
+            ])
+            ->filters([
                 // 2. Corrigido: Filtro simplificado por status
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'ativo' => 'Ativo',
                         'inativo' => 'Inativo',
                     ]),
-        ])
-        ->filters([
-            Tables\Filters\SelectFilter::make('cargo')
-                ->options([
-                    'colaborador' => 'Colaborador',
-                    'gestor' => 'Gestor',
-                    'admin' => 'Administrador',
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('cargo')
+                    ->options([
+                        'colaborador' => 'Colaborador',
+                        'gestor' => 'Gestor',
+                        'admin' => 'Administrador',
+                    ]),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Ver Progresso'),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-        ])
-        ->bulkActions([
-            Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]),
-        ]);
-}
+            ]);
+    }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('perfil', '!=', 'administrador'); 
+            ->where('perfil', '!=', 'administrador');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProgressosRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
@@ -146,6 +156,7 @@ public static function table(Table $table): Table
         return [
             'index' => Pages\ListColaboradors::route('/'),
             'create' => Pages\CreateColaborador::route('/create'),
+            'view' => Pages\ViewColaborador::route('/{record}'),
             'edit' => Pages\EditColaborador::route('/{record}/edit'),
         ];
     }
