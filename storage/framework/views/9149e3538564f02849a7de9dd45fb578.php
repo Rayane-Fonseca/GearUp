@@ -8,7 +8,7 @@
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes(['titulo-pagina' => 'Gerenciar Cursos','subtitulo-pagina' => 'Adicione, edite e organize os cursos da plataforma']); ?>
-    <div class="p-8 max-w-7xl mx-auto space-y-6" x-data="{
+    <div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6" x-data="{
         modalAberto: false,
         modoEdicao: false,
         cursoAtual: { id_curso: null, titulo: '', categoria: '', instrutor: '', carga_horaria: '', status: 'Não iniciado', descricao: '' },
@@ -23,15 +23,16 @@
             this.modalAberto = true;
         }
     }">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
             <p class="text-sm text-gray-500"><?php echo e($cursos->count()); ?> cursos cadastrados</p>
             <button @click="abrirNovo()" class="px-4 py-2.5 bg-blue-600 text-white text-xs font-semibold rounded-xl hover:bg-blue-700 flex items-center gap-2">
                 <span>+ Novo curso</span>
             </button>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <table class="w-full text-xs">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            
+            <table class="hidden md:table w-full text-xs">
                 <thead class="bg-gray-50 text-gray-400 uppercase text-[10px] tracking-wider">
                     <tr>
                         <th class="text-left px-6 py-3 font-semibold">Curso</th>
@@ -71,6 +72,42 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </tbody>
             </table>
+
+            
+            <div class="md:hidden divide-y divide-gray-100">
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $cursos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $curso): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php
+                $corStatus = $curso->status === 'Concluído' ? 'bg-emerald-50 text-emerald-600' : ($curso->status === 'Em andamento' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500');
+                ?>
+                <div class="p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-semibold text-gray-800 text-xs"><?php echo e($curso->titulo); ?></p>
+                            <p class="text-gray-400 text-[11px] mt-0.5"><?php echo e($curso->categoria); ?> • <?php echo e($curso->instrutor); ?></p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md font-medium text-[11px] shrink-0 <?php echo e($corStatus); ?>"><?php echo e($curso->status); ?></span>
+                    </div>
+                    
+                    <div class="flex items-center text-[11px] text-gray-500">
+                        <span><?php echo e($curso->carga_horaria); ?>h de duração</span>
+                        &nbsp;|&nbsp;
+                        <span><?php echo e($curso->modulos_count); ?> módulo(s)</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                        <a href="<?php echo e(route('admin.cursos.gerenciar', $curso->id_curso)); ?>" class="px-2.5 py-1.5 inline-flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 text-[11px] font-semibold">Gerenciar conteúdo</a>
+                        <button @click="abrirEdicao(<?php echo \Illuminate\Support\Js::from($curso->only(['id_curso','titulo','categoria','instrutor','carga_horaria','status','descricao']))->toHtml() ?>)" class="w-7 h-7 inline-flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">✎</button>
+                        <form method="POST" action="<?php echo e(route('admin.cursos.destroy', $curso->id_curso)); ?>" class="inline" onsubmit="return confirm('Remover este curso?');">
+                            <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
+                            <button type="submit" class="w-7 h-7 inline-flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+            </div>
         </div>
 
         <!-- Modal Novo/Editar Curso -->

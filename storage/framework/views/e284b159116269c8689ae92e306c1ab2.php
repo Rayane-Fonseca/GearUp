@@ -10,14 +10,24 @@
     <title>GearUp - Painel Administrativo</title>
     <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
 </head>
-<body class="bg-slate-50 font-sans flex min-h-screen">
-    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4 shrink-0">
+<body class="bg-slate-50 font-sans lg:flex min-h-screen" x-data="{ sidebarAberta: false }">
+    <!-- Overlay para fechar a sidebar no mobile -->
+    <div x-show="sidebarAberta" x-transition.opacity @click="sidebarAberta = false" class="fixed inset-0 bg-black/50 z-30 lg:hidden" style="display: none;"></div>
+
+    <aside :class="sidebarAberta ? 'translate-x-0' : '-translate-x-full'" class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4 shrink-0 fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static">
         <div class="space-y-6">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow p-1">
-                    <img src="<?php echo e(asset('images/Logo.png')); ?>" alt="GearUp Logo" class="w-full h-full object-contain">
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow p-1">
+                        <img src="<?php echo e(asset('images/Logo.png')); ?>" alt="GearUp Logo" class="w-full h-full object-contain">
+                    </div>
+                    <span class="font-bold text-2xl tracking-wide">GearUp</span>
                 </div>
-                <span class="font-bold text-2xl tracking-wide">GearUp</span>
+                <button @click="sidebarAberta = false" class="lg:hidden text-slate-400 hover:text-white p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="px-3">
@@ -50,10 +60,17 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
-        <header class="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between">
-            <div>
-                <h1 class="text-lg font-bold text-gray-900"><?php echo e($tituloPagina ?? ''); ?></h1>
-                <p class="text-xs text-gray-400"><?php echo e($subtituloPagina ?? ''); ?></p>
+        <header class="bg-white border-b border-gray-100 px-4 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3 min-w-0">
+                <button @click="sidebarAberta = true" class="lg:hidden text-gray-500 hover:text-gray-700 p-1 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <div class="min-w-0">
+                    <h1 class="text-lg font-bold text-gray-900 truncate"><?php echo e($tituloPagina ?? ''); ?></h1>
+                    <p class="text-xs text-gray-400 truncate"><?php echo e($subtituloPagina ?? ''); ?></p>
+                </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center font-bold text-white text-xs"><?php echo e($usuario->iniciais()); ?></div>
@@ -64,11 +81,10 @@
             <div class="mx-8 mt-4 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-xl"><?php echo e(session('status')); ?></div>
         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden">
             <?php echo e($slot); ?>
 
         </main>
     </div>
 </body>
-</html>
-<?php /**PATH C:\Users\otvoa\Downloads\GearUp\resources\views/components/admin-layout.blade.php ENDPATH**/ ?>
+</html><?php /**PATH C:\Users\otvoa\Downloads\GearUp\resources\views/components/admin-layout.blade.php ENDPATH**/ ?>

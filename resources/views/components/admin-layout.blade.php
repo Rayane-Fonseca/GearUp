@@ -81,7 +81,7 @@
             <div class="mx-8 mt-4 px-4 py-2.5 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-xl">{{ session('status') }}</div>
         @endif
 
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden">
             {{ $slot }}
         </main>
     </div>
