@@ -5,12 +5,3 @@
 [x-cloak] {
     display: none !important;
 }
-
-/* Esconde a barra de rolagem nativa (usada nos carrosséis de filtro) */
-.sem-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
-}
-.sem-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome/Safari/Edge */
-}
